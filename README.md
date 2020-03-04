@@ -4,14 +4,14 @@ Embedded Systems Project
 This projects idea is to control fan by using various sensors and automation methods.
 
 ## Features:
-- LCD screen displays the current mode and basic statistics
-    - used as a control interface
-    - fan control mode
-    - fan speed
-    - pressure level
-    - error notifications
+- LCD screen displays the current mode and basic statistics. It is used to:
+    - as a control interface
+    - to change fan control mode
+    - adjust fan speed
+    - set pressure level target
+    - show error notifications.
 - User interface
-    - Controlled by using external buttons and LCD screen.
+    - Controlled by using external buttons and a LCD screen.
 - Automatic mode
     - adjusts the fan speed by monitoring pressure level in the ventilation duct
     - PA level is adjustable and is used to set fan behavior (0 - 120 pa)
@@ -21,10 +21,10 @@ This projects idea is to control fan by using various sensors and automation met
 ## Installation:
 - Follow the user manual for installation instructions
 
-## Documents contain
+## Documents:
 - User manual
 - Wiring diagrams
-- Program documntation
+- Program documentation
 
 ## Components:
 - NXP LPC1549 LPCXpresso microcontroller board 
