@@ -1,7 +1,7 @@
 /*
 ===============================================================================
  Name        : main.c
- Author      : $(author)
+ Author      : Team 5
  Version     :
  Copyright   : $(copyright)
  Description : main definition
@@ -19,6 +19,7 @@
 #include <cr_section_macros.h>
 
 // TODO: insert other include files here
+#include "DigitalIoPin.h"
 
 // TODO: insert other definitions and declarations here
 
