@@ -19,7 +19,7 @@
 #include <cr_section_macros.h>
 
 // TODO: insert other include files here
-#include "DigitalIoPin.h"
+#include "DigitalIoPinMaster/DigitalIoPin.h"
 
 // TODO: insert other definitions and declarations here
 
