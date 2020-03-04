@@ -7,18 +7,34 @@
 
 #include "DigitalIoPin.h"
 
-DigitalIoPin::DigitalIoPin(int port, int pin, bool input, bool pullup, bool invert) {
+DigitalIoPin::DigitalIoPin(int port0, int pin0, bool input0, bool pullup0, bool invert0) {
+	port = port0;
+	pin = pin0;
+	input = input0;
+	pullup = pullup0;
+	invert = invert0;
 
 	if (input) {
-		Chip_IOCON_PinMuxSet(LPC_IOCON, port, pin, (IOCON_MODE_PULLUP | IOCON_DIGMODE_EN | IOCON_INV_EN));
-		Chip_GPIO_SetPinDIRInput(LPC_GPIO, port, pin);
+		if (invert) {
+			Chip_IOCON_PinMuxSet(LPC_IOCON, port, pin, (IOCON_MODE_PULLUP | IOCON_DIGMODE_EN | IOCON_INV_EN));
+			Chip_GPIO_SetPinDIRInput(LPC_GPIO, port, pin);
+		}
 
+		else {
+			Chip_IOCON_PinMuxSet(LPC_IOCON, port, pin, (IOCON_MODE_PULLUP | IOCON_DIGMODE_EN));
+			Chip_GPIO_SetPinDIRInput(LPC_GPIO, port, pin);
+		}
 	}
 
 	else if (!input) {
-		Chip_IOCON_PinMuxSet(LPC_IOCON, port, pin, (IOCON_MODE_INACT | IOCON_DIGMODE_EN | IOCON_INV_EN));
-		Chip_GPIO_SetPinDIROutput(LPC_GPIO, port, pin);
-
+		if (invert) {
+			Chip_IOCON_PinMuxSet(LPC_IOCON, port, pin, (IOCON_MODE_INACT | IOCON_DIGMODE_EN | IOCON_INV_EN));
+			Chip_GPIO_SetPinDIROutput(LPC_GPIO, port, pin);
+		}
+		else {
+			Chip_IOCON_PinMuxSet(LPC_IOCON, port, pin, (IOCON_MODE_INACT | IOCON_DIGMODE_EN));
+			Chip_GPIO_SetPinDIROutput(LPC_GPIO, port, pin);
+		}
 	}
 }
 

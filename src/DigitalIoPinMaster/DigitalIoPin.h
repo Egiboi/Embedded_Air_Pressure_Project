@@ -20,7 +20,7 @@ class DigitalIoPin {
 		void setPortPin(int x, int y, bool z);
 		void setPortPinState(bool onoff);
 
-	private:     // add these as needed }
+	private:
 		int port;
 		int pin;
 		bool input;
