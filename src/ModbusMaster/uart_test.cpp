@@ -76,7 +76,29 @@ void Sleep(int ms)
 uint32_t millis() {
 	return systicks;
 }
+#include "..\i2c_class\I2C.h"
+#if defined(BOARD_NXP_LPCXPRESSO_1549)
+/** 7-bit I2C addresses of  sensor (data sheet page 4/10) */
+#define I2C_PRES_ADDR  (0x40)
+#endif
 
+
+bool readPressureSensor(){
+	I2C_config conf;
+	I2C presSens(conf);
+	uint8_t data[3]={};
+	uint8_t commandRead = 0xF1;
+	presSens.write(I2C_PRES_ADDR, &commandRead, 1);
+	presSens.read(I2C_PRES_ADDR, data, 3);
+	int16_t dataCombined= data[0];
+	dataCombined = dataCombined << 8;
+	dataCombined |= data[1];
+	dataCombined = dataCombined *0.95/240;
+	printf("%d\n",dataCombined);
+	printf("%d\n",(int)data[2]);
+	return true;
+
+}
 #if 0
 void printRegister(ModbusMaster& node, uint16_t reg)
 {
@@ -258,7 +280,7 @@ void abbModbusTest()
 
 		// just print the value without checking if we got a -1
 		printf("F=%4d, I=%4d\n", (int) OutputFrequency, (int) Current);
-
+		readPressureSensor();
 		Sleep(3000);
 		i++;
 		if(i >= 20) {
