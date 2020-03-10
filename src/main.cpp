@@ -104,7 +104,7 @@ bool readPressureSensor(){
     while (k != 0) {
         if ((CRCdata & (1 << k)) >> k == 1) {
             int tempk = k;
-            for (int n = 8; n > 0; n--) {
+            for (int n = 8; n >= 0; n--) {
                 //CRCdata bit
                 int bit1 = (CRCdata & (1 << tempk)) >> tempk;
                 //Generator Polynomial bit
@@ -128,7 +128,8 @@ bool readPressureSensor(){
     }
     else {
         CRCCheck = false;
-        printf("Read fail\n");
+        printf("Read fail ");
+        printf("value: %x dataCombine: %d\n CRC leftover: %d\n", data[2], dataCombined*0,95/240, (int)CRCdata);
     }
 
     return CRCCheck;
@@ -574,7 +575,7 @@ int main(void)
 	printf("Started\n"); // goes to ITM console if retarget_itm.c is included
 	dbgu.write("Hello, world\n");
 
-	abbModbusTest();
-
+	//abbModbusTest();
+	modbusTest();
 	return 1;
 }
