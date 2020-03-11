@@ -74,7 +74,7 @@ uint32_t millis() {
 	return systicks;
 }
 
-bool readPressureSensor(){
+int readPressureSensor(){
     //Config I2C
     I2C_config conf;
     I2C presSens(conf);
@@ -95,11 +95,11 @@ bool readPressureSensor(){
     //Generator polynomial for CRC-8 check (data sheet 5/10)
     uint16_t CRC = 0x131;
     //Combine all 3 bytes to one 32 bit int
-    int32_t CRCdata = 0x69b3;
+    int32_t CRCdata = dataCombined;
     CRCdata = CRCdata << 8;
-    CRCdata |= 0xf2;
-    //loop lenght 3 bytes
-    int k = 16 + 8;
+    CRCdata |= data[2];
+    //loop lenght 2 bytes
+    int k = 16;
 
     while (k != 0) {
         if ((CRCdata & (1 << k)) >> k == 1) {
@@ -110,9 +110,11 @@ bool readPressureSensor(){
                 //Generator Polynomial bit
                 int bit2 = (CRC & (1 << n)) >> n;
 
-                // Set bit with XOR bitwise if bits not 0 and 0
-                if (!(bit1 == 0 && bit2 == 0)) {
-                    CRCdata = ((1<<tempk) ^ CRCdata);
+                //set bit if xor between bit1 and bit2 true, else unset
+                if (bit1 ^ bit2) {
+                	CRCdata |= 1UL<<tempk;
+                }else{
+                	CRCdata &= ~(1UL << tempk);
                 }
                 tempk--;
             }
@@ -132,7 +134,7 @@ bool readPressureSensor(){
         printf("value: %x dataCombine: %d\n CRC leftover: %d\n", data[2], dataCombined*0,95/240, (int)CRCdata);
     }
 
-    return CRCCheck;
+    return dataCombined;
 
 }
 
@@ -567,6 +569,7 @@ int main(void)
 			menuStatic->event(MenuItem::back);
 			back=FALSE;
 		}
+		readPressureSensor();
 
 	}
 
