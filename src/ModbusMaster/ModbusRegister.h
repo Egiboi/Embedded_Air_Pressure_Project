@@ -12,7 +12,7 @@
 
 class ModbusRegister {
 public:
-	ModbusRegister(ModbusMaster *master, int address);
+	ModbusRegister(ModbusMaster *master = NULL, int address = 0);
 	ModbusRegister(const ModbusRegister &)  = delete;
 	virtual ~ModbusRegister();
 	operator int();
