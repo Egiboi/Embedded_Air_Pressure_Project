@@ -5,7 +5,7 @@
  *      Author: arge
  */
 
-#include "BackEnd/BackEnd.cpp"
+#include "BackEnd/BackEnd.h"
 
 // TODO delet this clas :D
 class FrontEnd {
