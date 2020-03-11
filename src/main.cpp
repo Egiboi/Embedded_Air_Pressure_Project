@@ -160,6 +160,7 @@ void SysTick_Handler(void)
 {
 	systicks++;
 	if(counter < 5000) counter++;
+	if (counter1 > 0) counter1--;
 	else if(counter == 5000&&back==FALSE){
 		counter=0;
 		counter2 =0;
@@ -541,7 +542,48 @@ int main(void)
     counter=0;
 
 
+
+
+
+    //this goes behind the BackEnd
+	ModbusMaster node(2); // Create modbus object that connects to slave id 2
+	node.begin(9600); // set transmission rate - other parameters are set inside the object and can't be changed here
+
+	ModbusRegister ControlWord(&node, 0);
+	ModbusRegister StatusWord(&node, 3);
+	ModbusRegister OutputFrequency(&node, 102);
+	ModbusRegister Current(&node, 103);
+
+
+	// need to use explicit conversion since printf's variable argument doesn't automatically convert this to an integer
+	printf("Status=%04X\n", (int)StatusWord); // for debugging
+
+	ControlWord = 0x0406; // prepare for starting
+
+	printf("Status=%04X\n", (int)StatusWord); // for debugging
+
+	Sleep(1000); // give converter some time to set up
+	// note: we should have a startup state machine that check converter status and acts per current status
+	//       but we take the easy way out and just wait a while and hope that everything goes well
+
+	printf("Status=%04X\n", (int)StatusWord); // for debugging
+
+	ControlWord = 0x047F; // set drive to start mode
+
+	printf("Status=%04X\n", (int)StatusWord); // for debugging
+
+	Sleep(1000); // give converter some time to set up
+	// note: we should have a startup state machine that check converter status and acts per current status
+	//       but we take the easy way out and just wait a while and hope that everything goes well
+
+	printf("Status=%04X\n", (int)StatusWord); // for debugging
+
+	const uint16_t fa[20] = { 1000, 2000, 3000, 3500, 4000, 5000, 7000, 8000, 10000, 15000, 20000, 9000, 8000, 7000, 6000, 5000, 4000, 3000, 2000, 1000 };
+
+
+
 	while(1){
+		setFrequency(node, fa[10]);
 		if(bool1){
 			menuStatic->event(MenuItem::up);
 			while(sw1.read());
@@ -573,12 +615,12 @@ int main(void)
 
 	}
 
-	Board_LED_Set(0, false);
-	Board_LED_Set(1, true);
-	printf("Started\n"); // goes to ITM console if retarget_itm.c is included
-	dbgu.write("Hello, world\n");
+	//Board_LED_Set(0, false);
+	//Board_LED_Set(1, true);
+	//printf("Started\n"); // goes to ITM console if retarget_itm.c is included
+	//dbgu.write("Hello, world\n");
 
 	//abbModbusTest();
-	modbusTest();
+	//modbusTest();
 	return 1;
 }
