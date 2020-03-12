@@ -24,6 +24,7 @@ public:
 	void setMode(int i);
 	void defaultDisplay(LiquidCrystal*lcd, int fanspeed, int pascal);
 	int getMode();
+	int getErrorCode();
 private:
 	int mode = 0;					// Setting mode to 0 will redirect flow to modeSelect(), auto = 1, manual = 2.
 	uint16_t pressuretarget = 0;	// Target for the automaticMode
