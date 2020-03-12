@@ -17,7 +17,7 @@ FrontEnd::~FrontEnd() {
 	// TODO Auto-generated destructor stub
 }
 
- /* namespace std */
+/* namespace std */
 
 /*int FrontEnd::modeSelect(int i){
 	//int mode = frontend.modeSelect();
@@ -26,7 +26,7 @@ FrontEnd::~FrontEnd() {
 	}
 }*/
 
-uint16_t FrontEnd::defaultRun(uint16_t pre, uint16_t fsp){
+uint16_t FrontEnd::defaultRun(uint16_t pre, uint16_t fsp) {
 	if (mode == 0){
 		//modeSelect();
 	}
@@ -39,21 +39,11 @@ uint16_t FrontEnd::defaultRun(uint16_t pre, uint16_t fsp){
 }
 
 
-uint16_t FrontEnd::manualMode(uint16_t freq){
-	if (!manualset){
-		//manualModeSetup();
-	}
-	else {
-
-
-		return freq;
-		//fanspeed = frontend.getFrequency();
-		//backend.setFrequency(fanspeed);
-	}
-	// TODO frontend: print manualMode info to LCD
+uint16_t FrontEnd::manualMode(uint16_t freq) {
+	return freq;
 }
 
-uint16_t FrontEnd::automaticMode(uint16_t currentpressure, uint16_t fanspeed){
+uint16_t FrontEnd::automaticMode(uint16_t currentpressure, uint16_t fanspeed) {
 	bool higherror = false;
 	bool lowerror = false;
 
@@ -61,7 +51,6 @@ uint16_t FrontEnd::automaticMode(uint16_t currentpressure, uint16_t fanspeed){
 	if (pressuretarget > currentpressure){
 		if (fanspeed <= fanspeedmax){
 			return fanspeed++;
-			//backend.setFrequency(++fanspeed);
 			higherror = false;
 		}
 		else{
@@ -70,7 +59,6 @@ uint16_t FrontEnd::automaticMode(uint16_t currentpressure, uint16_t fanspeed){
 	}
 	else if (pressuretarget < currentpressure){
 		if (fanspeed >= 0){
-			//backend.setFrequency(--fanspeed);
 			fanspeed--;
 			lowerror = false;
 		}
@@ -78,8 +66,7 @@ uint16_t FrontEnd::automaticMode(uint16_t currentpressure, uint16_t fanspeed){
 			lowerror = true;
 		}
 	}
-	else{
-		//backend.setFrequency(fanspeed);
+	else {
 		fanspeed;
 	}
 	if (higherror || lowerror){
@@ -89,10 +76,11 @@ uint16_t FrontEnd::automaticMode(uint16_t currentpressure, uint16_t fanspeed){
 		if (lowerror){
 			// TODO frontend: print error info (fan at 0 and cant go lower) to LCD
 		}
+
 		higherror = false;
 		lowerror = false;
 	}
-	else{
+	else {
 		// TODO frontend: print automaticMode info to the LCD
 	}
 }
