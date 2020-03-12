@@ -10,6 +10,7 @@
 
 FrontEnd::FrontEnd() {
 	// TODO Auto-generated constructor stub
+	errorcode=0;
 
 }
 
@@ -38,13 +39,6 @@ uint16_t FrontEnd::defaultRun(uint16_t pre, uint16_t fsp) {
 	}
 }
 
-void FrontEnd::setPressureTarget(uint16_t trg) {
-	pressuretarget = trg;
-}
-
-void FrontEnd::setMode(int i) {
-	mode = i;
-}
 
 uint16_t FrontEnd::manualMode(uint16_t freq) {
 	return freq;
@@ -74,7 +68,7 @@ uint16_t FrontEnd::automaticMode(uint16_t currentpressure, uint16_t fanspeed) {
 		}
 	}
 	else {
-		return fanspeed;
+		fanspeed;
 	}
 	if (higherror || lowerror){
 		if (higherror){
@@ -98,16 +92,17 @@ void FrontEnd::defaultDisplay(LiquidCrystal*lcd, int fanspeed, int pascal){
 	char s1[17],s2[17];
 
 	if(mode==1) {
-		snprintf(s1, 17, "Pascals:%3d  AUTO", pascal);
+		snprintf(s1, 17, "Pascals:%3d AUTO", pascal);
 	}
 	else if (mode==2) {
-		snprintf(s1, 17, "Pascals:%3d  MANU", pascal);
+		snprintf(s1, 17, "Pascals:%3d MANU", pascal);
 	}
-	lcd->print(s2,1);
+	lcd->print(s1,1);
 	if(errorcode!=0){
-		snprintf(s1, 17, "           FAIL");
+		snprintf(s2, 17, "Speed:%2d/20 FAIL",fanspeed);
+
 	}else{
-		snprintf(s1, 17, " ");
+		snprintf(s2, 17, "Speed:%2d/20 FAIL",fanspeed);
 	}
 	lcd->setCursor(0,1);
 	lcd->print(s2,2);
