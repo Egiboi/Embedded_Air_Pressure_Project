@@ -33,14 +33,10 @@ void manualModeSetup();
 void manualMode();
 void automaticMode();
 
-int modeSelect(){
-	int newmode = frontend.modeSelect();
-	if (newmode != 0){
+void modeSelect(){
+	int mode = frontend.modeSelect();
+	if (mode != 0){
 		manualset = false;
-		return mode;
-	}
-	else{
-		return newmode;
 	}
 }
 
