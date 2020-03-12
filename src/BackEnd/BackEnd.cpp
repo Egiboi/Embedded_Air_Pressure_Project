@@ -69,8 +69,6 @@ bool BackEnd::setFrequency(uint16_t fanspeed)
 }
 
 bool BackEnd::readPressureSensor() {
-	//Config I2C
-	I2C_config conf;
 	I2C presSens(conf);
 	//Initalize data container
 	uint8_t data[3]={};
