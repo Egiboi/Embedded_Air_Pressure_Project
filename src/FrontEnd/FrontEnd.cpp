@@ -11,7 +11,7 @@
 FrontEnd::FrontEnd() {
 	// TODO Auto-generated constructor stub
 	errorcode=0;
-
+	looper=0;
 }
 
 FrontEnd::~FrontEnd() {
@@ -55,42 +55,46 @@ uint16_t FrontEnd::automaticMode(uint16_t currentpressure, uint16_t fanspeed) {
 
 
 	if (pressuretarget > currentpressure){
-		if (fanspeed <= fanspeedmax){
+		if (fanspeed < fanspeedmax){
 			higherror = false;
 			return ++fanspeed;
 		}
 		else {
 			higherror = true;
+			++looper;
 		}
 	}
 	else if (pressuretarget < currentpressure){
-		if (fanspeed >= 0) {
+		if (fanspeed > 0) {
 			lowerror = false;
 			return --fanspeed;
 		}
 		else{
 			lowerror = true;
+			++looper;
+
 		}
 	}
 	else {
 		return fanspeed;
 	}
-	if (higherror || lowerror) {
+	if (looper>30) {
 		if (higherror){
 			// TODO frontend: print error info (fan at max and cant go higher) to LCD
-			error = 2;
+			errorcode = 2;
 		}
 		if (lowerror){
 			// TODO frontend: print error info (fan at 0 and cant go lower) to LCD
-			error = 1;
+			errorcode = 1;
 		}
 
 		higherror = false;
 		lowerror = false;
+		return fanspeed;
 	}
 	else {
 		// TODO frontend: print automaticMode info to the LCD
-		error = 0;
+		errorcode = 0;
 	}
 }
 

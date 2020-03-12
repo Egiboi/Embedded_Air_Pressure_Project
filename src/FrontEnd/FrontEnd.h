@@ -29,7 +29,7 @@ private:
 	int mode = 0;					// Setting mode to 0 will redirect flow to modeSelect(), auto = 1, manual = 2.
 	uint16_t pressuretarget = 0;	// Target for the automaticMode
 	int errorcode;
-
+	int looper;
 	bool manualset = false;
 	uint16_t manualMode(uint16_t freq);
 	uint16_t automaticMode(uint16_t currentpressure, uint16_t fanspeed);
