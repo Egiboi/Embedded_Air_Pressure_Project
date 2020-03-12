@@ -15,7 +15,7 @@ public:
 							this needs to be cancelled after 30 seconds */
 	int getFrequency(){}	// get wanted frequency in manual mode dialog
 	int getPressure(){}		// get wanted pressure in automatic mode dialog
-	void setManualMode(){}	/* ManualModeSetup dialog, for setting initial fan speed,
+	int setManualMode(){}	/* ManualModeSetup dialog, for setting initial fan speed,
 							this needs to be cancelled after 30 seconds */
 };
 
@@ -56,9 +56,13 @@ void defaultRun(){
 }
 
 void manualModeSetup(){
-	frontend.setManualMode();
+	int oldmode = mode;
+	mode = frontend.setManualMode();
+	if (mode == 0) mode = oldmode;
+	else{
 	fanspeed = frontend.getFrequency();
 	manualset = true;
+	}
 }
 
 void manualMode(){
