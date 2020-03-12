@@ -21,6 +21,8 @@ BackEnd::BackEnd() {
 	delayMicroseconds(1000);
 	ControlWord = 0x047F; // set drive to start mode
 	delayMicroseconds(1000);
+
+
 }
 
 BackEnd::~BackEnd() {
@@ -67,8 +69,6 @@ bool BackEnd::setFrequency(uint16_t fanspeed)
 }
 
 bool BackEnd::readPressureSensor() {
-	//Config I2C
-	I2C_config conf;
 	I2C presSens(conf);
 	//Initalize data container
 	uint8_t data[3]={};
@@ -158,7 +158,7 @@ int BackEnd::getPressureSensor() {
 }
 
 void BackEnd::prepPinForSet (int port, int pin){
-	Chip_IOCON_PinMuxSet(LPC_IOCON, port, pin,(IOCON_MODE_PULLUP |IOCON_DIGMODE_EN | IOCON_MODE_INACT));
+	Chip_IOCON_PinMuxSet(LPC_IOCON, port, pin,(IOCON_MODE_PULLUP |IOCON_DIGMODE_EN |IOCON_MODE_INACT));
 	/* Configure GPIO pin as input */
 	Chip_GPIO_SetPinDIRInput(LPC_GPIO, port, pin);
 
@@ -185,6 +185,7 @@ void BackEnd::setPinInterrupt(int port, int pin, int interruptChannel){
 }
 
 
+
 void BackEnd::delayMicroseconds(unsigned int us)
 {
 	uint64_t ticks = (Chip_Clock_GetSystemClockRate()/1000000)*us;
@@ -195,6 +196,28 @@ void BackEnd::delayMicroseconds(unsigned int us)
 	while((LPC_RITIMER->CTRL & 0x1)==0);
 	Chip_RIT_ClearCTRL(LPC_RITIMER,0x08);
 	Chip_RIT_ClearCTRL(LPC_RITIMER,0x01);
+}
+bool BackEnd::insertAndCheckCircBuf(int index, int value){
+	bool check = TRUE;
+	int *ptr;
+	if(index==0){
+		ptr=circBuf1;
+	}else if(index==1){
+		ptr=circBuf2;
+	}else if(index==2){
+		ptr=circBuf3;
+	}
+	for(int i=0;i<9;i++){
+		 ptr[i+1]=ptr[i];
+
+	}
+	ptr[0]=value;
+	for(int i=0;i<10;i++){
+		if(ptr[i]==0){
+			check=false;
+		}
+	}
+	return check;
 }
 
 
