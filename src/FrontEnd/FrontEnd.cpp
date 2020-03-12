@@ -104,13 +104,15 @@ void FrontEnd::defaultDisplay(LiquidCrystal*lcd, int fanspeed, int pascal){
 	}
 	else if (mode==2) {
 		snprintf(s1, 17, "Pascals:%3d MANU", pascal);
+	}else if(mode==0){
+		snprintf(s1, 17,"Unset mode");
 	}
 	lcd->print(s1,1);
 	if(errorcode!=0){
 		snprintf(s2, 17, "Speed:%2d/20 FAIL",fanspeed);
 
 	}else{
-		snprintf(s2, 17, "Speed:%2d/20 FAIL",fanspeed);
+		snprintf(s2, 17, "Speed:%2d/20     ",fanspeed);
 	}
 	lcd->setCursor(0,1);
 	lcd->print(s2,2);

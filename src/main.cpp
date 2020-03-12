@@ -215,9 +215,9 @@ int main(void)
 	bool1=false, bool2=false, bool3=false;
 
 	uint16_t i = 0;
-	i = (uint16_t) Manu -> getValue() / 5; //manual mode
 
 	while(1) {
+		i= interface.getFrequency();
 		interface.setFrequency(frontend.defaultRun(interface.readPressureSensor(), i));
 		interface.readPressureSensor();
 		printf("Fan speed is: %d\n", (int)i);
@@ -251,7 +251,7 @@ int main(void)
 				}
 
 
-				i = (uint16_t) Manu -> getValue() / 5;
+
 				menuStatic->print();
 				counterChangedValue=0;
 				counterDefaultRunScreen=30000;

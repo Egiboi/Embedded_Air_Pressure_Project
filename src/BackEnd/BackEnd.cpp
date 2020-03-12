@@ -50,7 +50,7 @@ bool BackEnd::setFrequency(uint16_t fanspeed)
 
 	else {
 		Frequency = fa[fanspeed]; // set motor frequency
-		speed=fanspeed+1;
+		speed=fanspeed;
 	}
 
 	// wait until we reach set point or timeout occurs
@@ -166,7 +166,7 @@ void BackEnd::prepPinForSet (int port, int pin){
 	Chip_GPIO_SetPinDIRInput(LPC_GPIO, port, pin);
 
 }
-uint16_t getFrequency(){
+uint16_t  BackEnd::getFrequency(){
 	return speed;
 }
 
