@@ -8,18 +8,32 @@
 #ifndef BACKEND_BACKEND_H_
 #define BACKEND_BACKEND_H_
 
+#include "../ModbusMaster/ModbusMaster.h"
+#include "../ModbusMaster/ModbusRegister.h"
+#include "../ModbusMaster/LpcUart.h"
+
 class BackEnd {
 public:
 	BackEnd();
 	virtual ~BackEnd();
-	bool setFrequency(ModbusMaster& node, uint16_t freq);
-	bool readPressureSensor();
-	int getPressureSensor();
+	bool setFrequency(uint16_t freq);						//for setting fan speed
+	bool readPressureSensor();								//for updating pressure sensor variable
+	int getPressureSensor();								//prints pressure sensor variable
+	void delayMicroseconds(unsigned int us);				//delay function
 private:
-	int pressure;
-	static const int current;
-	const uint16_t fa[20] = { 1000, 2000, 3000, 3500, 4000, 5000, 7000, 8000, 10000, 15000, 20000, 9000, 8000, 7000, 6000, 5000, 4000, 3000, 2000, 1000 };
 
+	//modbus variables
+	ModbusMaster node;
+	ModbusRegister ControlWord;
+	ModbusRegister StatusWord;
+	ModbusRegister OutputFrequency;
+	ModbusRegister Current;
+
+
+	const uint16_t fa[21] = { 0, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000, 11000 ,12000, 13000, 14000, 15000, 16000, 17000, 18000, 19000, 20000 };
+
+	//pressure sensor variables
+	int pressure;
 };
 
 #endif /* BACKEND_BACKEND_H_ */
