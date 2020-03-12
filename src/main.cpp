@@ -213,11 +213,8 @@ int main(void)
 	uint16_t i = 0;
 	i = (uint16_t) Manu -> getValue() / 5; //manual mode
 
-	while(1){
-		//setFrequency(node, fa[10]);
-		//interface.setFrequency(i);
+	while(1) {
 		interface.setFrequency(frontend.defaultRun(interface.readPressureSensor(), i));
-		//interface.setFrequency(i);
 		interface.readPressureSensor();
 		printf("Fan speed is: %d\n", (int)i);
 		printf("Pressure level is: %d\n", (int)interface.getPressureSensor());
