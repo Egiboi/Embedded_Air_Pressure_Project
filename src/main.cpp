@@ -71,12 +71,13 @@ uint32_t millis() {
 static SimpleMenu *menuStatic;
 
 
-static volatile std::atomic_int counter, counter1, counter2;
+static volatile std::atomic_int counterBack, counterSleep, counterChangedValue, counterDefaultRunScreen;
 static volatile std::atomic_bool back, bool1, bool2, bool3;
 #ifdef __cplusplus
 extern "C" {
 #endif
 /**
+ *
  * @brief Handle interrupt from SysTick timer
  * @return Nothing
  */
@@ -86,19 +87,20 @@ extern "C" {
 void SysTick_Handler(void)
 {
 	systicks++;
-	if(counter < 5000) counter++;
-	if (counter1 > 0) counter1--;
-	else if(counter == 5000&&back==FALSE){
-		counter=0;
-		counter2 =0;
+	if(counterDefaultRunScreen<30000)counterDefaultRunScreen++;
+	if(counterBack < 5000) counterBack++;
+	if (counterSleep > 0) counterSleep--;
+	else if(counterBack == 5000&&back==FALSE){
+		counterBack=0;
+		counterChangedValue =0;
 		back = TRUE;
 	}
 
 }
 void Sleep(int ms)
 {
-	counter1 = ms;
-	while(counter1 > 0) {
+	counterSleep = ms;
+	while(counterSleep > 0) {
 		__WFI();
 	}
 }
@@ -106,7 +108,7 @@ void Sleep(int ms)
 void PIN_INT0_IRQHandler(void){
 	if(bool1==FALSE){
 		bool1=TRUE;
-		counter=0;
+		counterBack=0;
 	}
 
 	Chip_PININT_ClearIntStatus(LPC_GPIO_PIN_INT, PININTCH(0));
@@ -114,8 +116,8 @@ void PIN_INT0_IRQHandler(void){
 void PIN_INT1_IRQHandler(void){
 	if(bool2==FALSE){
 		bool2=TRUE;
-		counter2++;
-		counter=0;
+		counterChangedValue++;
+		counterBack=0;
 	}
 
 	Chip_PININT_ClearIntStatus(LPC_GPIO_PIN_INT, PININTCH(1));
@@ -123,7 +125,7 @@ void PIN_INT1_IRQHandler(void){
 void PIN_INT2_IRQHandler(void){
 	if(bool3==FALSE){
 		bool3=TRUE;
-		counter=0;
+		counterBack=0;
 	}
 	Chip_PININT_ClearIntStatus(LPC_GPIO_PIN_INT, PININTCH(2));
 }
@@ -184,10 +186,12 @@ int main(void)
 	/* Enable and setup SysTick Timer at a periodic rate */
 	SysTick_Config(SystemCoreClock / 1000);
 
-	counter2=0;
-	menu.event(MenuItem::show); // display first menu item
+	counterChangedValue=0;
+	//menu.event(MenuItem::show); // display first menu item
+	//go to default runScreen first
+	counterDefaultRunScreen=30000;
 	back=FALSE;
-	counter = 0;
+	counterBack = 0;
 
 	BackEnd interface;
 	FrontEnd frontend;
@@ -221,20 +225,25 @@ int main(void)
 
 		if(bool1){
 			menuStatic->event(MenuItem::up);
-			while(Chip_GPIO_GetPinState(LPC_GPIO, 0, 16));
+			while(!Chip_GPIO_GetPinState(LPC_GPIO, 0, 16)){
+			}
+			counterDefaultRunScreen=0;
 			Sleep(100);
 			bool1=FALSE;
 		}
 
 		else if(bool2){
 			menuStatic->event(MenuItem::ok);
-
+			counterDefaultRunScreen=0;
 			Sleep(100);
 
 			i = (uint16_t) Manu -> getValue() / 5;
-			if(counter2>=2){
+			if(counterChangedValue>=2){
 				menuStatic->print();
-				counter2=0;
+				counterChangedValue=0;
+				counterDefaultRunScreen=30000;
+			}
+			while(!Chip_GPIO_GetPinState(LPC_GPIO, 1, 3)){
 			}
 			bool2=FALSE;
 
@@ -242,11 +251,17 @@ int main(void)
 		else if(bool3){
 			menuStatic->event(MenuItem::down);
 			while(!Chip_GPIO_GetPinState(LPC_GPIO, 0, 0));
+			counterDefaultRunScreen=0;
 			Sleep(100);
 			bool3=FALSE;
 		}else if(back==TRUE){
 			menuStatic->event(MenuItem::back);
 			back=FALSE;
+		}
+		if(counterDefaultRunScreen==30000){
+			frontend.defaultDisplay(lcd, 0, (int)interface.getPressureSensor());
+			counterDefaultRunScreen=27000;
+			counterBack=0;
 		}
 
 		Sleep(50);
