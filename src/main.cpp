@@ -211,12 +211,15 @@ int main(void)
 	DigitalIoPin sw2(1,3,true,true,true);
 	DigitalIoPin sw3(0,0,true,true,true);
 
+	uint16_t i = 0;
+	i = (uint16_t) Manu -> getValue() / 5;
 
 	while(1){
 		//setFrequency(node, fa[10]);
-		interface.setFrequency(21);
+		interface.setFrequency(i);
 		interface.readPressureSensor();
-		printf("%d\n", (int)interface.getPressureSensor());
+		printf("Fan speed is: %d\n", (int)i);
+		printf("Pressure level is: %d\n", (int)interface.getPressureSensor());
 
 		if(bool1){
 			menuStatic->event(MenuItem::up);
@@ -230,6 +233,7 @@ int main(void)
 			while(sw2.read());
 			NVIC_ClearPendingIRQ(PIN_INT1_IRQn);
 			bool2=FALSE;
+			i = (uint16_t) Manu -> getValue() / 5;
 			if(counter2>=2){
 				menuStatic->print();
 				counter2=0;
