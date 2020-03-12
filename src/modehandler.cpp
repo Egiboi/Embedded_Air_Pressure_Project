@@ -5,7 +5,7 @@
  *      Author: arge
  */
 
-#include "BackEnd/BackEnd.cpp"
+#include "BackEnd/BackEnd.h"
 
 // TODO delet this clas :D
 class FrontEnd {
@@ -15,7 +15,7 @@ public:
 							this needs to be cancelled after 30 seconds */
 	int getFrequency(){}	// get wanted frequency in manual mode dialog
 	int getPressure(){}		// get wanted pressure in automatic mode dialog
-	void setManualMode(){}	/* ManualModeSetup dialog, for setting initial fan speed,
+	int setManualMode(){}	/* ManualModeSetup dialog, for setting initial fan speed,
 							this needs to be cancelled after 30 seconds */
 };
 
@@ -32,14 +32,10 @@ void manualModeSetup();
 void manualMode();
 void automaticMode();
 
-int modeSelect(){
-	int newmode = frontend.modeSelect();
-	if (newmode != 0){
+void modeSelect(){
+	int mode = frontend.modeSelect();
+	if (mode != 0){
 		manualset = false;
-		return mode;
-	}
-	else{
-		return newmode;
 	}
 }
 
@@ -56,8 +52,7 @@ void defaultRun(){
 }
 
 void manualModeSetup(){
-	frontend.setManualMode();
-	fanspeed = frontend.getFrequency();
+	fanspeed = frontend.setManualMode();
 	manualset = true;
 }
 
