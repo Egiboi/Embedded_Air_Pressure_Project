@@ -233,10 +233,24 @@ int main(void)
 		}
 
 		else if(bool2){
+			bool tempbool1=Auto -> getFocus();
+			bool tempbool2=Manu -> getFocus();
 			menuStatic->event(MenuItem::ok);
 			counterDefaultRunScreen=0;
 			Sleep(100);
 			if(counterChangedValue>=2){
+
+				if (tempbool1) {
+					frontend.setPressureTarget((uint16_t) Auto -> getValue()); //sets pressuretarget value
+					frontend.setMode(1);
+				}
+
+				else if (tempbool2) {
+					frontend.setMode(2);
+					i = (uint16_t) Manu -> getValue() / 5;
+				}
+
+
 				i = (uint16_t) Manu -> getValue() / 5;
 				menuStatic->print();
 				counterChangedValue=0;

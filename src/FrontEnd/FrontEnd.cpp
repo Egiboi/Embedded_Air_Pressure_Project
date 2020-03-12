@@ -86,6 +86,14 @@ uint16_t FrontEnd::automaticMode(uint16_t currentpressure, uint16_t fanspeed) {
 	}
 }
 
+void FrontEnd::setPressureTarget(uint16_t trg) {
+	pressuretarget = trg;
+}
+
+void FrontEnd::setMode(int i) {
+	mode = i;
+}
+
 void FrontEnd::defaultDisplay(LiquidCrystal*lcd, int fanspeed, int pascal){
 	lcd->clear();
 	lcd->setCursor(0,0);
