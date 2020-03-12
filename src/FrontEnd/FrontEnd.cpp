@@ -40,16 +40,16 @@ uint16_t FrontEnd::defaultRun(uint16_t pre, uint16_t fsp){
 
 
 uint16_t FrontEnd::manualMode(uint16_t freq){
-	if (!manualset){
+	//if (!manualset){
 		//manualModeSetup();
-	}
-	else {
+	//}
+	//else {
 
 
 		return freq;
 		//fanspeed = frontend.getFrequency();
 		//backend.setFrequency(fanspeed);
-	}
+	//}
 	// TODO frontend: print manualMode info to LCD
 }
 
