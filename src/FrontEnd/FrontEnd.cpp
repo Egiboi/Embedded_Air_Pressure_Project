@@ -56,17 +56,17 @@ uint16_t FrontEnd::automaticMode(uint16_t currentpressure, uint16_t fanspeed) {
 
 	if (pressuretarget > currentpressure){
 		if (fanspeed <= fanspeedmax){
-			return ++fanspeed;
 			higherror = false;
+			return ++fanspeed;
 		}
-		else{
+		else {
 			higherror = true;
 		}
 	}
 	else if (pressuretarget < currentpressure){
-		if (fanspeed >= 0){
-			return --fanspeed;
+		if (fanspeed >= 0) {
 			lowerror = false;
+			return --fanspeed;
 		}
 		else{
 			lowerror = true;
@@ -75,12 +75,14 @@ uint16_t FrontEnd::automaticMode(uint16_t currentpressure, uint16_t fanspeed) {
 	else {
 		fanspeed;
 	}
-	if (higherror || lowerror){
+	if (higherror || lowerror) {
 		if (higherror){
 			// TODO frontend: print error info (fan at max and cant go higher) to LCD
+			error = 2;
 		}
 		if (lowerror){
 			// TODO frontend: print error info (fan at 0 and cant go lower) to LCD
+			error = 1;
 		}
 
 		higherror = false;
@@ -88,6 +90,7 @@ uint16_t FrontEnd::automaticMode(uint16_t currentpressure, uint16_t fanspeed) {
 	}
 	else {
 		// TODO frontend: print automaticMode info to the LCD
+		error = 0;
 	}
 }
 
@@ -121,6 +124,10 @@ void FrontEnd::defaultDisplay(LiquidCrystal*lcd, int fanspeed, int pascal){
 	}
 	lcd->setCursor(0,1);
 	lcd->print(s2,2);
+}
+
+int FrontEnd::getErrorCode() {
+	return errorcode;
 }
 
 
