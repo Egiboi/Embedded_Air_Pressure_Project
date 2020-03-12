@@ -30,19 +30,16 @@
 
 #include <cstring>
 #include <cstdio>
+#include <atomic>
 
-//#include "ModbusMaster/ModbusMaster.h"
-//#include "ModbusMaster/ModbusRegister.h"
-//#include "ModbusMaster/LpcUart.h"
+
 #include "BackEnd/BackEnd.h"
-
+#include "FrontEnd/FrontEnd.h"
 #include "DigitalIoPinMaster_class/DigitalIoPin.h"
-//#include "i2c_class/I2C.h"
 #include "GUI_class/SimpleMenu.h"
 #include "GUI_class/LiquidCrystal.h"
 #include "GUI_class/IntegerEdit.h"
 #include "GUI_class/DecimalEdit.h"
-#include <atomic>
 
 
 /*****************************************************************************
@@ -191,6 +188,7 @@ int main(void)
 	counter = 0;
 
 	BackEnd interface;
+	FrontEnd frontend;
 
 	/* Set pin back to GPIO (on some boards may have been changed to something else by Board_Init()) */
 	Chip_PININT_Init(LPC_GPIO_PIN_INT);
@@ -212,11 +210,12 @@ int main(void)
 	DigitalIoPin sw3(0,0,true,true,true);
 
 	uint16_t i = 0;
-	i = (uint16_t) Manu -> getValue() / 5;
+	i = (uint16_t) Manu -> getValue() / 5; //manual mode
 
 	while(1){
 		//setFrequency(node, fa[10]);
-		interface.setFrequency(i);
+		//interface.setFrequency(i);
+		interface.setFrequency(frontend.defaultRun(interface.readPressureSensor(), i));
 		interface.readPressureSensor();
 		printf("Fan speed is: %d\n", (int)i);
 		printf("Pressure level is: %d\n", (int)interface.getPressureSensor());
