@@ -27,15 +27,20 @@ FrontEnd::~FrontEnd() {
 	}
 }*/
 
+int FrontEnd::getMode(){
+	return mode;
+}
+
 uint16_t FrontEnd::defaultRun(uint16_t pre, uint16_t fsp) {
 	if (mode == 0){
 		//modeSelect();
 	}
 	else if (mode == 1){
-		automaticMode(pre, fsp);
+		return automaticMode(pre, fsp);
+
 	}
 	else if (mode == 2){
-		manualMode(fsp);
+		return manualMode(fsp);
 	}
 }
 
@@ -51,7 +56,7 @@ uint16_t FrontEnd::automaticMode(uint16_t currentpressure, uint16_t fanspeed) {
 
 	if (pressuretarget > currentpressure){
 		if (fanspeed <= fanspeedmax){
-			return fanspeed++;
+			return ++fanspeed;
 			higherror = false;
 		}
 		else{
@@ -60,7 +65,7 @@ uint16_t FrontEnd::automaticMode(uint16_t currentpressure, uint16_t fanspeed) {
 	}
 	else if (pressuretarget < currentpressure){
 		if (fanspeed >= 0){
-			fanspeed--;
+			return --fanspeed;
 			lowerror = false;
 		}
 		else{

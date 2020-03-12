@@ -215,10 +215,13 @@ int main(void)
 	bool1=false, bool2=false, bool3=false;
 
 	uint16_t i = 0;
-
+	int currentSpeed=0;
 	while(1) {
-		i= interface.getFrequency();
-		interface.setFrequency(frontend.defaultRun(interface.readPressureSensor(), i));
+		if(frontend.getMode()==1){
+			i=interface.getFrequency();
+		}
+		currentSpeed= interface.getFrequency();
+		interface.setFrequency(frontend.defaultRun(interface.getPressureSensor(), i));
 		interface.readPressureSensor();
 		printf("Fan speed is: %d\n", (int)i);
 		printf("Pressure level is: %d\n", (int)interface.getPressureSensor());
@@ -248,13 +251,15 @@ int main(void)
 				else if (tempbool2) {
 					frontend.setMode(2);
 					i = (uint16_t) Manu -> getValue() / 5;
+
+
 				}
 
 
 
 				menuStatic->print();
 				counterChangedValue=0;
-				counterDefaultRunScreen=30000;
+				counterDefaultRunScreen=29000;
 			}
 			while(!Chip_GPIO_GetPinState(LPC_GPIO, 1, 3)){
 			}
@@ -272,7 +277,7 @@ int main(void)
 			back=FALSE;
 		}
 		if(counterDefaultRunScreen==30000){
-			frontend.defaultDisplay(lcd, (int)i, (int)interface.getPressureSensor());
+			frontend.defaultDisplay(lcd, (int)currentSpeed, (int)interface.getPressureSensor());
 			counterDefaultRunScreen=27000;
 			counterBack=0;
 		}
