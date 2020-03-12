@@ -73,7 +73,7 @@ uint16_t FrontEnd::automaticMode(uint16_t currentpressure, uint16_t fanspeed) {
 		}
 	}
 	else {
-		fanspeed;
+		return fanspeed;
 	}
 	if (higherror || lowerror){
 		if (higherror){

@@ -71,7 +71,7 @@ uint32_t millis() {
 static SimpleMenu *menuStatic;
 
 
-static volatile std::atomic_int counterBack, counterSleep, counterChangedValue, counterDefaultRunScreen;
+static volatile std::atomic_int counterBack, counterSleep, counterChangedValue, counterDefaultRunScreen, counterSetFrequency;
 static volatile std::atomic_bool back, bool1, bool2, bool3;
 #ifdef __cplusplus
 extern "C" {
@@ -87,6 +87,7 @@ extern "C" {
 void SysTick_Handler(void)
 {
 	systicks++;
+	if(counterSetFrequency<500)counterSetFrequency++;
 	if(counterDefaultRunScreen<30000)counterDefaultRunScreen++;
 	if(counterBack < 5000) counterBack++;
 	if (counterSleep > 0) counterSleep--;
@@ -150,7 +151,7 @@ int main(void)
 	Board_LED_Set(0, true);
 #endif
 #endif
-
+	counterSetFrequency=0;
 	//LCD defined
 	DigitalIoPin d7(0,7,FALSE), d6(0,6,FALSE),d5(0,5,FALSE), d4(1,8,FALSE), en(1,6,FALSE), rs(0,8,FALSE);
 	LiquidCrystal *lcd = new LiquidCrystal(&rs, &en, &d4, &d5, &d6, &d7);
@@ -221,7 +222,11 @@ int main(void)
 			i=interface.getFrequency();
 		}
 		currentSpeed= interface.getFrequency();
-		interface.setFrequency(frontend.defaultRun(interface.getPressureSensor(), i));
+		//set frequency once a second
+		if(counterSetFrequency==500){
+			interface.setFrequency(frontend.defaultRun(interface.getPressureSensor(), i));
+			counterSetFrequency=0;
+		}
 		interface.readPressureSensor();
 		printf("Fan speed is: %d\n", (int)i);
 		printf("Pressure level is: %d\n", (int)interface.getPressureSensor());
