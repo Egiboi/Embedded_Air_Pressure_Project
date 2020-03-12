@@ -111,7 +111,7 @@ void automaticMode(){
 
 void mainloop(){
 	while (mode == 0){
-		mode = modeSelect();
+		modeSelect();
 	}
 	while(1){
 		defaultRun();
