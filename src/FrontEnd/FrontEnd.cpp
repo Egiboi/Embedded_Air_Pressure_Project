@@ -38,6 +38,13 @@ uint16_t FrontEnd::defaultRun(uint16_t pre, uint16_t fsp) {
 	}
 }
 
+void FrontEnd::setPressureTarget(uint16_t trg) {
+	pressuretarget = trg;
+}
+
+void FrontEnd::setMode(int i) {
+	mode = i;
+}
 
 uint16_t FrontEnd::manualMode(uint16_t freq) {
 	return freq;
@@ -67,7 +74,7 @@ uint16_t FrontEnd::automaticMode(uint16_t currentpressure, uint16_t fanspeed) {
 		}
 	}
 	else {
-		fanspeed;
+		return fanspeed;
 	}
 	if (higherror || lowerror){
 		if (higherror){
