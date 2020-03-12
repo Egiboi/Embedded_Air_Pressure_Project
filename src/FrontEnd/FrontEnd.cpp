@@ -97,4 +97,25 @@ uint16_t FrontEnd::automaticMode(uint16_t currentpressure, uint16_t fanspeed){
 	}
 }
 
+void FrontEnd::defaultDisplay(LiquidCrystal*lcd, int fanspeed, int pascal){
+	lcd->clear();
+	lcd->setCursor(0,0);
+	char s1[17],s2[17];
+
+	if(mode==1) {
+		snprintf(s1, 17, "Pascals:%3d  AUTO", pascal);
+	}
+	else if (mode==2) {
+		snprintf(s1, 17, "Pascals:%3d  MANU", pascal);
+	}
+	lcd->print(s2,1);
+	if(errorcode!=0){
+		snprintf(s1, 17, "           FAIL");
+	}else{
+		snprintf(s1, 17, " ");
+	}
+	lcd->setCursor(0,1);
+	lcd->print(s2,2);
+}
+
 
