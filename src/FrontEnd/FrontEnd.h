@@ -9,6 +9,7 @@
 #define FRONTEND_FRONTEND_H_
 
 #include <stdint.h>
+#include "../GUI_class/LiquidCrystal.h"
 
 class FrontEnd {
 public:
@@ -21,6 +22,7 @@ public:
 	uint16_t defaultRun(uint16_t pre, uint16_t fsp);
 	void setPressureTarget(uint16_t trg);
 	void setMode(int i);
+	void defaultDisplay(LiquidCrystal*lcd, int fanspeed, int pascal);
 private:
 	int mode = 0;					// Setting mode to 0 will redirect flow to modeSelect(), auto = 1, manual = 2.
 	uint16_t pressuretarget = 0;	// Target for the automaticMode

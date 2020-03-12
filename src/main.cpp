@@ -210,11 +210,12 @@ int main(void)
 
 	bool1=false, bool2=false, bool3=false;
 
-	uint16_t i = 0;	//
-	int mode = 0;	//this is for switching between modes
+	uint16_t i = 0;
 	i = (uint16_t) Manu -> getValue() / 5; //manual mode
 
-	while(1) {
+	while(1){
+		//setFrequency(node, fa[10]);
+		//interface.setFrequency(i);
 		interface.setFrequency(frontend.defaultRun(interface.readPressureSensor(), i));
 		interface.readPressureSensor();
 		printf("Fan speed is: %d\n", (int)i);
@@ -229,18 +230,10 @@ int main(void)
 
 		else if(bool2){
 			menuStatic->event(MenuItem::ok);
+
 			Sleep(100);
 
-			if (Auto -> getFocus()) {
-				frontend.setPressureTarget((uint16_t) Auto -> getValue() /5); //sets pressuretarget value
-				frontend.setMode(1);
-			}
-
-			else if (Manu -> getFocus()) {
-				frontend.setMode(2);
-				i = (uint16_t) Manu -> getValue() / 5;
-			}
-
+			i = (uint16_t) Manu -> getValue() / 5;
 			if(counter2>=2){
 				menuStatic->print();
 				counter2=0;
