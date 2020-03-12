@@ -10,7 +10,6 @@
 
 FrontEnd::FrontEnd() {
 	// TODO Auto-generated constructor stub
-	errorcode=0;
 
 }
 
@@ -99,18 +98,19 @@ void FrontEnd::defaultDisplay(LiquidCrystal*lcd, int fanspeed, int pascal){
 	char s1[17],s2[17];
 
 	if(mode==1) {
-		snprintf(s1, 17, "Pascals:%3d AUTO", pascal);
+		snprintf(s1, 17, "Pascals:%3d  AUTO", pascal);
 	}
 	else if (mode==2) {
-		snprintf(s1, 17, "Pascals:%3d MANU", pascal);
+		snprintf(s1, 17, "Pascals:%3d  MANU", pascal);
 	}
-	lcd->print(s1,1);
+	lcd->print(s2,1);
 	if(errorcode!=0){
-		snprintf(s2, 17, "           FAIL");
-		lcd->setCursor(0,1);
-		lcd->print(s2,2);
+		snprintf(s1, 17, "           FAIL");
+	}else{
+		snprintf(s1, 17, " ");
 	}
-
+	lcd->setCursor(0,1);
+	lcd->print(s2,2);
 }
 
 
