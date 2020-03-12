@@ -11,6 +11,10 @@
 #include "../ModbusMaster/ModbusMaster.h"
 #include "../ModbusMaster/ModbusRegister.h"
 #include "../ModbusMaster/LpcUart.h"
+#include "../i2c_class/I2C.h"
+
+/** 7-bit I2C addresses of  sensor (data sheet page 4/10) */
+#define I2C_PRES_ADDR  (0x40)
 
 class BackEnd {
 public:
@@ -33,7 +37,7 @@ private:
 	const uint16_t fa[21] = { 0, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000, 11000 ,12000, 13000, 14000, 15000, 16000, 17000, 18000, 19000, 20000 };
 
 	//pressure sensor variables
-	int pressure;
+	int16_t pressure;
 };
 
 #endif /* BACKEND_BACKEND_H_ */

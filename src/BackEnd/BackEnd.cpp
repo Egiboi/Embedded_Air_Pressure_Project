@@ -60,9 +60,87 @@ bool BackEnd::setFrequency(uint16_t freq)
 }
 
 bool BackEnd::readPressureSensor() {
+	//Config I2C
+	I2C_config conf;
+	I2C presSens(conf);
+	//Initalize data container
+	uint8_t data[3]={};
+	int16_t dataCombined = 0, mask=0x00FFFFFF;
+	//Command to read device through I2C
+	uint8_t commandRead = 0xF1;
+	//Generator polynomial for CRC-8 check (data sheet 5/10)
+	uint16_t CRC = 0x131;
 
+	uint32_t CRCdata =0;
+	bool I2CCheck=true;
 
-	return false;
+	//Write 1 byte to I2C, with commandRead
+	if(!presSens.write(I2C_PRES_ADDR, &commandRead, 1)){
+		//printf("I2C write fail\n");
+		I2CCheck=false;
+	}
+	//Read 3 bytes of reply, 2 data, 1 CRC
+	else if(!presSens.read(I2C_PRES_ADDR, data, 3)){
+		//printf("I2C read fail\n");
+		I2CCheck=false;
+	}else{
+		//Combine the 2 data bytes to one 16bit int
+		dataCombined= data[0];
+		dataCombined = dataCombined << 8;
+		dataCombined |= data[1];
+
+		//Combine all 3 bytes to one 32 bit int
+		CRCdata |= dataCombined;
+		CRCdata = CRCdata << 8;
+		CRCdata |= data[2];
+		CRCdata &= mask;
+		//loop lenght 2 bytes (2nd and 3rd bit)
+		int k = 16+8;
+
+		while (k-(8-1) != 0) {
+			if ((CRCdata & (1 << k)) >> k == 1) {
+				int tempk = k;
+				for (int n = 8; n >= 0; n--) {
+					//CRCdata bit
+					int bit1 = (CRCdata & (1 << tempk)) >> tempk;
+					//Generator Polynomial bit
+					int bit2 = (CRC & (1 << n)) >> n;
+
+					//set bit if xor between bit1 and bit2 true, else unset
+					if (bit1 ^ bit2) {
+						CRCdata |= 1UL<<tempk;
+					}else{
+						CRCdata &= ~(1UL << tempk);
+					}
+					tempk--;
+				}
+			}
+			k--;
+		}
+	}
+
+	if (CRCdata == 0 && I2CCheck ==TRUE) {
+		//altitude fix
+		dataCombined = dataCombined *0.95/240;
+		//printf("%d\n", (int)dataCombined);
+		pressure = dataCombined;
+		return true;
+	}
+	else if(I2CCheck && CRCdata!=0) {
+		//printf("CRC check failed\n");
+		return false;
+	}
+
+	else if(!I2CCheck && CRCdata==0){
+		//Cannot happen
+		//printf("I2C transaction failed\n");
+		return false;
+	}
+
+	else{
+		//printf("Multifail\n");
+		return false;
+	}
 }
 
 

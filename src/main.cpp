@@ -37,17 +37,12 @@
 #include "BackEnd/BackEnd.h"
 
 #include "DigitalIoPinMaster_class/DigitalIoPin.h"
-#include "i2c_class/I2C.h"
+//#include "i2c_class/I2C.h"
 #include "GUI_class/SimpleMenu.h"
 #include "GUI_class/LiquidCrystal.h"
 #include "GUI_class/IntegerEdit.h"
 #include "GUI_class/DecimalEdit.h"
 #include <atomic>
-
-/** 7-bit I2C addresses of  sensor (data sheet page 4/10) */
-#define I2C_PRES_ADDR  (0x40)
-
-
 
 
 /*****************************************************************************
@@ -74,70 +69,6 @@ static volatile uint32_t systicks;
 uint32_t millis() {
 	return systicks;
 }
-
-bool readPressureSensor(){
-	//Config I2C
-	I2C_config conf;
-	I2C presSens(conf);
-	//Initalize data container
-	uint8_t data[3]={};
-	//Command to read device through I2C
-	uint8_t commandRead = 0xF1;
-	//Write 1 byte to I2C, with commandRead
-	presSens.write(I2C_PRES_ADDR, &commandRead, 1);
-	//Read 3 bytes of reply, 2 data, 1 CRC
-	presSens.read(I2C_PRES_ADDR, data, 3);
-	//Combine the 2 data bytes to one 16bit int
-	int16_t dataCombined= data[0];
-	dataCombined = dataCombined << 8;
-	dataCombined |= data[1];
-	//Boolean for good check;
-	bool CRCCheck = false;
-	//Generator polynomial for CRC-8 check (data sheet 5/10)
-	uint16_t CRC = 0x131;
-	//Combine all 3 bytes to one 32 bit int
-	int32_t CRCdata = 0x69b3;
-	CRCdata = CRCdata << 8;
-	CRCdata |= 0xf2;
-	//loop lenght 3 bytes
-	int k = 16 + 8;
-
-	while (k != 0) {
-		if ((CRCdata & (1 << k)) >> k == 1) {
-			int tempk = k;
-			for (int n = 8; n >= 0; n--) {
-				//CRCdata bit
-				int bit1 = (CRCdata & (1 << tempk)) >> tempk;
-				//Generator Polynomial bit
-				int bit2 = (CRC & (1 << n)) >> n;
-
-				// Set bit with XOR bitwise if bits not 0 and 0
-				if (!(bit1 == 0 && bit2 == 0)) {
-					CRCdata = ((1<<tempk) ^ CRCdata);
-				}
-				tempk--;
-			}
-		}
-		k--;
-
-	}
-	if (CRCdata == 0) {
-		CRCCheck = true;
-		//altitude fix
-		dataCombined = dataCombined *0.95/240;
-		printf("%d\n", (int)dataCombined);
-	}
-	else {
-		CRCCheck = false;
-		printf("Read fail ");
-		printf("value: %x dataCombine: %d\n CRC leftover: %d\n", data[2], dataCombined*0,95/240, (int)CRCdata);
-	}
-
-	return CRCCheck;
-
-}
-
-
 
 
 static SimpleMenu *menuStatic;
@@ -307,6 +238,8 @@ int main(void)
 	while(1){
 		//setFrequency(node, fa[10]);
 		interface.setFrequency(20000);
+		interface.readPressureSensor();
+		printf("%d\n", (int)interface.getPressureSensor());
 
 		if(bool1){
 			menuStatic->event(MenuItem::up);
