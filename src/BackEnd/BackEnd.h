@@ -26,6 +26,7 @@ public:
 	void delayMicroseconds(unsigned int us);				//delay function
 	void setPinInterrupt(int port, int pin, int interruptChannel); //sets pint interrupts 0-2
 	void prepPinForSet (int port, int pin); 				//Preps pins for interrupting
+	bool insertAndCheckCircBuf(int index, int value);
 private:
 
 	//modbus variables
@@ -34,7 +35,7 @@ private:
 	ModbusRegister StatusWord;
 	ModbusRegister OutputFrequency;
 	ModbusRegister Current;
-
+	int circBuf1 [10], circBuf2[10], circBuf3[10];
 
 	const uint16_t fa[21] = { 0, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000, 11000 ,12000, 13000, 14000, 15000, 16000, 17000, 18000, 19000, 20000 };
 

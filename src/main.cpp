@@ -111,6 +111,7 @@ void PIN_INT0_IRQHandler(void){
 		bool1=TRUE;
 		counter=0;
 	}
+
 	Chip_PININT_ClearIntStatus(LPC_GPIO_PIN_INT, PININTCH(0));
 }
 void PIN_INT1_IRQHandler(void){
@@ -119,6 +120,7 @@ void PIN_INT1_IRQHandler(void){
 		counter2++;
 		counter=0;
 	}
+
 	Chip_PININT_ClearIntStatus(LPC_GPIO_PIN_INT, PININTCH(1));
 }
 void PIN_INT2_IRQHandler(void){
@@ -207,15 +209,13 @@ int main(void)
 	interface.setPinInterrupt(1, 3, 1);
 	interface.setPinInterrupt(0, 0, 2);
 
-	DigitalIoPin sw1(0,16,true,true,true);
-	DigitalIoPin sw2(1,3,true,true,true);
-	DigitalIoPin sw3(0,0,true,true,true);
+
+	bool1=false, bool2=false, bool3=false;
 
 	uint16_t i = 0;
 	i = (uint16_t) Manu -> getValue() / 5;
 
 	while(1){
-		//setFrequency(node, fa[10]);
 		interface.setFrequency(i);
 		interface.readPressureSensor();
 		printf("Fan speed is: %d\n", (int)i);
@@ -223,41 +223,37 @@ int main(void)
 
 		if(bool1){
 			menuStatic->event(MenuItem::up);
-			while(sw1.read());
-			NVIC_ClearPendingIRQ(PIN_INT0_IRQn);
+			while(Chip_GPIO_GetPinState(LPC_GPIO, 0, 16));
+			Sleep(100);
 			bool1=FALSE;
 		}
 
 		else if(bool2){
 			menuStatic->event(MenuItem::ok);
-			while(sw2.read());
-			NVIC_ClearPendingIRQ(PIN_INT1_IRQn);
-			bool2=FALSE;
+
+			Sleep(100);
+
 			i = (uint16_t) Manu -> getValue() / 5;
 			if(counter2>=2){
 				menuStatic->print();
 				counter2=0;
 			}
+			bool2=FALSE;
 
 		}
 		else if(bool3){
 			menuStatic->event(MenuItem::down);
-			while(sw3.read());
-			NVIC_ClearPendingIRQ(PIN_INT2_IRQn);
+			while(!Chip_GPIO_GetPinState(LPC_GPIO, 0, 0));
+			Sleep(100);
 			bool3=FALSE;
 		}else if(back==TRUE){
 			menuStatic->event(MenuItem::back);
 			back=FALSE;
 		}
 
+		Sleep(50);
+
 	}
 
-	//Board_LED_Set(0, false);
-	//Board_LED_Set(1, true);
-	//printf("Started\n"); // goes to ITM console if retarget_itm.c is included
-	//dbgu.write("Hello, world\n");
-
-	//abbModbusTest();
-	//modbusTest();
 	return 1;
 }
