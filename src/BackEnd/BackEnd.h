@@ -20,7 +20,7 @@ class BackEnd {
 public:
 	BackEnd();
 	virtual ~BackEnd();
-	bool setFrequency(uint16_t freq);						//for setting fan speed
+	bool setFrequency(uint16_t fanspeed);						//for setting fan speed
 	bool readPressureSensor();								//for updating pressure sensor variable
 	int getPressureSensor();								//prints pressure sensor variable
 	void delayMicroseconds(unsigned int us);				//delay function
@@ -36,7 +36,7 @@ private:
 
 	const uint16_t fa[21] = { 0, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000, 11000 ,12000, 13000, 14000, 15000, 16000, 17000, 18000, 19000, 20000 };
 
-	//pressure sensor variables
+	//pressure sensor variable
 	int16_t pressure;
 };
 

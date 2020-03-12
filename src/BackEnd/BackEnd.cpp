@@ -27,7 +27,7 @@ BackEnd::~BackEnd() {
 	// TODO Auto-generated destructor stub
 }
 
-bool BackEnd::setFrequency(uint16_t freq)
+bool BackEnd::setFrequency(uint16_t fanspeed)
 {
 	int result;
 	int ctr;
@@ -37,9 +37,16 @@ bool BackEnd::setFrequency(uint16_t freq)
 	ModbusRegister Frequency(&node, 1); // reference 1
 	ModbusRegister StatusWord(&node, 3);
 
-	Frequency = freq; // set motor frequency
+	if (20 < fanspeed) {
+		Frequency = fa[20]; // set motor frequency max
+	}
+	else if (fanspeed < 0) {
+		Frequency = fa[0]; // set motor frequency zero
+	}
 
-	//printf("Set freq = %d\n", freq/40); // for debugging
+	else {
+		Frequency = fa[fanspeed]; // set motor frequency
+	}
 
 	// wait until we reach set point or timeout occurs
 	ctr = 0;
