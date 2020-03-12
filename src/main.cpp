@@ -70,8 +70,13 @@ uint32_t millis() {
 
 static SimpleMenu *menuStatic;
 
-
+//counterBack=timer for returning back after inactivity (currently 5sec) returnBack define
+//counterSleep= Sleep function timer, user set
+//counterChangedValue= Keeps track of when a value gets saved (can be screwed up if focus is unset and set inside one main loop)
+//counterDefaultRunScreen= works like back timer, but takes 30sec and goes to default run screen. (also handset in code for quicker returns) define returnScreen
+//counterSetFrequency= Value for time between set frequency (currently 0.5sec) define setFrequencyTime
 static volatile std::atomic_int counterBack, counterSleep, counterChangedValue, counterDefaultRunScreen, counterSetFrequency;
+//Toggling booleans for menu logic, set in pin interrupts
 static volatile std::atomic_bool back, bool1, bool2, bool3;
 #ifdef __cplusplus
 extern "C" {
@@ -82,16 +87,20 @@ extern "C" {
  * @return Nothing
  */
 
-
+#define returnRunScreen 30000
+#define returnBack 5000
+#define setFrequencyTime 500
+#define mainSleep 50
+#define buttonSleep 100
 
 void SysTick_Handler(void)
 {
 	systicks++;
-	if(counterSetFrequency<500)counterSetFrequency++;
+	if(counterSetFrequency<setFrequencyTime)counterSetFrequency++;
 	if(counterDefaultRunScreen<30000)counterDefaultRunScreen++;
-	if(counterBack < 5000) counterBack++;
+	if(counterBack < returnBack) counterBack++;
 	if (counterSleep > 0) counterSleep--;
-	else if(counterBack == 5000&&back==FALSE){
+	else if(counterBack == returnBack&&back==FALSE){
 		counterBack=0;
 		counterChangedValue =0;
 		back = TRUE;
@@ -151,7 +160,7 @@ int main(void)
 	Board_LED_Set(0, true);
 #endif
 #endif
-	counterSetFrequency=0;
+
 	//LCD defined
 	DigitalIoPin d7(0,7,FALSE), d6(0,6,FALSE),d5(0,5,FALSE), d4(1,8,FALSE), en(1,6,FALSE), rs(0,8,FALSE);
 	LiquidCrystal *lcd = new LiquidCrystal(&rs, &en, &d4, &d5, &d6, &d7);
@@ -187,15 +196,20 @@ int main(void)
 	/* Enable and setup SysTick Timer at a periodic rate */
 	SysTick_Config(SystemCoreClock / 1000);
 
+
+
+	//Atomic variables set
+	counterSetFrequency=0;
 	counterChangedValue=0;
-	//menu.event(MenuItem::show); // display first menu item
 	//go to default runScreen first
-	counterDefaultRunScreen=30000;
-	back=FALSE;
+	counterDefaultRunScreen=returnRunScreen;
 	counterBack = 0;
+	back=false,bool1=false, bool2=false, bool3=false;;
+
 
 	BackEnd interface;
 	FrontEnd frontend;
+
 
 	/* Set pin back to GPIO (on some boards may have been changed to something else by Board_Init()) */
 	Chip_PININT_Init(LPC_GPIO_PIN_INT);
@@ -213,81 +227,94 @@ int main(void)
 	interface.setPinInterrupt(0, 0, 2);
 
 
-	bool1=false, bool2=false, bool3=false;
 
-	uint16_t i = 0;
+	//wantedSpeed will be wanted speed in manual mode and current speed in automatic mode (not ideal for clarity)
+	uint16_t wantedSpeed = 0;
 	int currentSpeed=0;
 	while(1) {
-		if(frontend.getMode()==1){
-			i=interface.getFrequency();
-		}
+		//value will be used run screen
 		currentSpeed= interface.getFrequency();
-		//set frequency once a second
-		if(counterSetFrequency==500){
-			interface.setFrequency(frontend.defaultRun(interface.getPressureSensor(), i));
+		if(frontend.getMode()==1){
+			wantedSpeed=currentSpeed;//if mode is automatic set wantedSpeed to current speed
+		}
+
+		//set frequency according to setFrequency time (currently 0.5sec)
+		if(counterSetFrequency==setFrequencyTime){
+			interface.setFrequency(frontend.defaultRun(interface.getPressureSensor(), wantedSpeed));
 			counterSetFrequency=0;
 		}
-		interface.readPressureSensor();
-		printf("Fan speed is: %d\n", (int)i);
+		//printing to itm
+		printf("Fan speed is: %d\n", (int)wantedSpeed);
 		printf("Pressure level is: %d\n", (int)interface.getPressureSensor());
-
+		//button boolean up was set and system reacts
 		if(bool1){
 			menuStatic->event(MenuItem::up);
 			while(!Chip_GPIO_GetPinState(LPC_GPIO, 0, 16)){
+				//TODO max time
 			}
 			counterDefaultRunScreen=0;
-			Sleep(100);
+			Sleep(buttonSleep);
 			bool1=FALSE;
 		}
-
+		//button boolean ok was set and system reacts
 		else if(bool2){
+			//Checks focus item. Value will be used if value saves.
 			bool tempbool1=Auto -> getFocus();
 			bool tempbool2=Manu -> getFocus();
 			menuStatic->event(MenuItem::ok);
 			counterDefaultRunScreen=0;
-			Sleep(100);
+			Sleep(buttonSleep);
+			//Checks if values is saved (Focus -> no Focus from ok click)
 			if(counterChangedValue>=2){
-
 				if (tempbool1) {
 					frontend.setPressureTarget((uint16_t) Auto -> getValue()); //sets pressuretarget value
-					frontend.setMode(1);
+					frontend.setMode(1);//set automatic mode
 				}
 
 				else if (tempbool2) {
+					//set manual mode
 					frontend.setMode(2);
-					i = (uint16_t) Manu -> getValue() / 5;
+					//set speed for manual
+					wantedSpeed = (uint16_t) Manu -> getValue() / 5;
 
 
 				}
-
-
-
 				menuStatic->print();
 				counterChangedValue=0;
-				counterDefaultRunScreen=29000;
+				//Give fan one second to react before run screen prints and reads speed and pressure
+				counterDefaultRunScreen=returnRunScreen-1000;
 			}
 			while(!Chip_GPIO_GetPinState(LPC_GPIO, 1, 3)){
+				//TODO max time
 			}
 			bool2=FALSE;
 
 		}
+		//button boolean down was set and system reacts
 		else if(bool3){
 			menuStatic->event(MenuItem::down);
-			while(!Chip_GPIO_GetPinState(LPC_GPIO, 0, 0));
+			while(!Chip_GPIO_GetPinState(LPC_GPIO, 0, 0)){
+				//TODO max time
+			}
 			counterDefaultRunScreen=0;
-			Sleep(100);
+			Sleep(buttonSleep);
 			bool3=FALSE;
-		}else if(back==TRUE){
+		}
+		//Time out to go back
+		else if(back==TRUE){
+
 			menuStatic->event(MenuItem::back);
 			back=FALSE;
 		}
-		if(counterDefaultRunScreen==30000){
+		//default run screen will be displayed and overwrites menu
+		if(counterDefaultRunScreen==returnRunScreen){
 			frontend.defaultDisplay(lcd, (int)currentSpeed, (int)interface.getPressureSensor());
-			counterDefaultRunScreen=27000;
+			//When run screen is reached, next loop to update values is only 3 seconds
+			counterDefaultRunScreen=returnRunScreen-3000;
 			counterBack=0;
 		}
 
-		Sleep(50);
+		Sleep(mainSleep);
 
 	}
 

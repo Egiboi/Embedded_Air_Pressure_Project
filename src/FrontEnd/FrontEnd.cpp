@@ -9,7 +9,6 @@
 
 
 FrontEnd::FrontEnd() {
-	// TODO Auto-generated constructor stub
 	errorcode=0;
 	looper=0;
 }
@@ -55,8 +54,11 @@ uint16_t FrontEnd::automaticMode(uint16_t currentpressure, uint16_t fanspeed) {
 
 
 	if (pressuretarget > currentpressure){
+		//High speed
 		if (fanspeed < fanspeedmax){
 			higherror = false;
+			looper=0;
+			errorcode=0;
 			return ++fanspeed;
 		}
 		else {
@@ -65,37 +67,44 @@ uint16_t FrontEnd::automaticMode(uint16_t currentpressure, uint16_t fanspeed) {
 		}
 	}
 	else if (pressuretarget < currentpressure){
+		//Low speed
 		if (fanspeed > 0) {
 			lowerror = false;
+			looper=0;
+			errorcode=0;
 			return --fanspeed;
 		}
 		else{
+			//Low error currently not reachable as fan stops at zero
 			lowerror = true;
 			++looper;
 
 		}
 	}
 	else {
+		//Good Speed
 		return fanspeed;
 	}
-	if (looper>30) {
+	//Loops 20 times after max/min speed reached, then error made set
+	if (looper>20) {
 		if (higherror){
-			// TODO frontend: print error info (fan at max and cant go higher) to LCD
 			errorcode = 2;
 		}
 		if (lowerror){
-			// TODO frontend: print error info (fan at 0 and cant go lower) to LCD
 			errorcode = 1;
+
 		}
 
 		higherror = false;
 		lowerror = false;
-		return fanspeed;
+
 	}
 	else {
-		// TODO frontend: print automaticMode info to the LCD
 		errorcode = 0;
 	}
+	//Fan speed already at max/min at this point return current so fan doesn't stop
+	//Reaches here only when target pressure out of reach
+	return fanspeed;
 }
 
 void FrontEnd::setPressureTarget(uint16_t trg) {
@@ -110,15 +119,16 @@ void FrontEnd::defaultDisplay(LiquidCrystal*lcd, int fanspeed, int pascal){
 	lcd->clear();
 	lcd->setCursor(0,0);
 	char s1[17],s2[17];
-
+	//firstline
 	if(mode==1) {
 		snprintf(s1, 17, "Pascals:%3d AUTO", pascal);
 	}
 	else if (mode==2) {
 		snprintf(s1, 17, "Pascals:%3d MANU", pascal);
 	}else if(mode==0){
-		snprintf(s1, 17,"Unset mode");
+		snprintf(s1, 17,"Standby mode");
 	}
+	//Second line
 	lcd->print(s1,1);
 	if(errorcode!=0){
 		snprintf(s2, 17, "Speed:%2d/20 FAIL",fanspeed);

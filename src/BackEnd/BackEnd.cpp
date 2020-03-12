@@ -52,7 +52,6 @@ bool BackEnd::setFrequency(uint16_t fanspeed)
 		Frequency = fa[fanspeed]; // set motor frequency
 		speed=fanspeed;
 	}
-
 	// wait until we reach set point or timeout occurs
 	ctr = 0;
 	atSetpoint = false;
@@ -103,13 +102,14 @@ bool BackEnd::readPressureSensor() {
 		CRCdata |= dataCombined;
 		CRCdata = CRCdata << 8;
 		CRCdata |= data[2];
+		//Mask possible last bits;
 		CRCdata &= mask;
-		//loop lenght 2 bytes (2nd and 3rd bit)
+		//loop length 2 bytes (2nd and 3rd bit)
 		int k = 16+8;
-
 		while (k-(8-1) != 0) {
 			if ((CRCdata & (1 << k)) >> k == 1) {
 				int tempk = k;
+				//loop polynomial length (9bits)
 				for (int n = 8; n >= 0; n--) {
 					//CRCdata bit
 					int bit1 = (CRCdata & (1 << tempk)) >> tempk;
@@ -142,7 +142,7 @@ bool BackEnd::readPressureSensor() {
 	}
 
 	else if(!I2CCheck && CRCdata==0){
-		//Cannot happen
+		//Cannot happen (at least CRCdata is not valid)
 		//printf("I2C transaction failed\n");
 		return false;
 	}
@@ -156,7 +156,6 @@ bool BackEnd::readPressureSensor() {
 
 
 int BackEnd::getPressureSensor() {
-
 	return pressure;
 }
 
@@ -178,6 +177,7 @@ void BackEnd::setPinInterrupt(int port, int pin, int interruptChannel){
 	Chip_PININT_ClearIntStatus(LPC_GPIO_PIN_INT, PININTCH(interruptChannel));
 	Chip_PININT_SetPinModeEdge(LPC_GPIO_PIN_INT, PININTCH(interruptChannel));
 	Chip_PININT_EnableIntLow(LPC_GPIO_PIN_INT, PININTCH(interruptChannel));
+	//enable interrupts
 	if(interruptChannel==0){
 		NVIC_ClearPendingIRQ(PIN_INT0_IRQn);
 		NVIC_EnableIRQ(PIN_INT0_IRQn);
@@ -204,6 +204,7 @@ void BackEnd::delayMicroseconds(unsigned int us)
 	Chip_RIT_ClearCTRL(LPC_RITIMER,0x01);
 }
 bool BackEnd::insertAndCheckCircBuf(int index, int value){
+	//attempt at a 10 space buffer for dealing with button misreads
 	bool check = TRUE;
 	int *ptr;
 	if(index==0){

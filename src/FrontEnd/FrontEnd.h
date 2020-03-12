@@ -19,12 +19,12 @@ public:
 	//int getFrequency(uint16_t i);	// get wanted frequency in manual mode dialog
 	//int getPressure(uint16_t i);	// get wanted pressure in automatic mode dialog
 	int setMode();					/* ManualModeSetup dialog, for setting initial fan speed, this needs to be cancelled after 30 seconds */
-	uint16_t defaultRun(uint16_t pre, uint16_t fsp);
-	void setPressureTarget(uint16_t trg);
-	void setMode(int i);
-	void defaultDisplay(LiquidCrystal*lcd, int fanspeed, int pascal);
-	int getMode();
-	int getErrorCode();
+	uint16_t defaultRun(uint16_t pre, uint16_t fsp);//Returns a 0-20 value for next wanted fan speed. directly returns manual speed, calculates next wanted autospeed
+	void setPressureTarget(uint16_t trg);//sets pressure target for automatic mode
+	void setMode(int i);			// sets mode (standby/auto/manual)
+	void defaultDisplay(LiquidCrystal*lcd, int fanspeed, int pascal); //default run screen (out of menu)
+	int getMode();					//returns current mode 0=standby,1=automatic,2=manual
+	int getErrorCode();				//returns error code (unused?)
 private:
 	int mode = 0;					// Setting mode to 0 will redirect flow to modeSelect(), auto = 1, manual = 2.
 	uint16_t pressuretarget = 0;	// Target for the automaticMode
