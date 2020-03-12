@@ -157,6 +157,34 @@ int BackEnd::getPressureSensor() {
 	return pressure;
 }
 
+void BackEnd::prepPinForSet (int port, int pin){
+	Chip_IOCON_PinMuxSet(LPC_IOCON, port, pin,(IOCON_MODE_PULLUP |IOCON_DIGMODE_EN | IOCON_MODE_INACT));
+	/* Configure GPIO pin as input */
+	Chip_GPIO_SetPinDIRInput(LPC_GPIO, port, pin);
+
+}
+
+void BackEnd::setPinInterrupt(int port, int pin, int interruptChannel){
+
+	/* Configure interrupt channel for the GPIO pin in INMUX block */
+	Chip_INMUX_PinIntSel(interruptChannel, port, pin);
+	/* Configure channel interrupt as edge sensitive and falling edge interrupt */
+	Chip_PININT_ClearIntStatus(LPC_GPIO_PIN_INT, PININTCH(interruptChannel));
+	Chip_PININT_SetPinModeEdge(LPC_GPIO_PIN_INT, PININTCH(interruptChannel));
+	Chip_PININT_EnableIntLow(LPC_GPIO_PIN_INT, PININTCH(interruptChannel));
+	if(interruptChannel==0){
+		NVIC_ClearPendingIRQ(PIN_INT0_IRQn);
+		NVIC_EnableIRQ(PIN_INT0_IRQn);
+	}else if(interruptChannel==1){
+		NVIC_ClearPendingIRQ(PIN_INT1_IRQn);
+		NVIC_EnableIRQ(PIN_INT1_IRQn);
+	}else if(interruptChannel==2){
+		NVIC_ClearPendingIRQ(PIN_INT2_IRQn);
+		NVIC_EnableIRQ(PIN_INT2_IRQn);
+	}
+}
+
+
 void BackEnd::delayMicroseconds(unsigned int us)
 {
 	uint64_t ticks = (Chip_Clock_GetSystemClockRate()/1000000)*us;

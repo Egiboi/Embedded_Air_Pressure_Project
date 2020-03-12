@@ -166,47 +166,6 @@ int main(void)
 
 
 
-	//interrupt and button define
-	Chip_PININT_Init(LPC_GPIO_PIN_INT);
-
-	/* Set pin back to GPIO (on some boards may have been changed to something
-		   else by Board_Init()) */
-	Chip_IOCON_PinMuxSet(LPC_IOCON, 0, 17,(IOCON_MODE_PULLUP |IOCON_DIGMODE_EN | IOCON_MODE_INACT) );
-	Chip_IOCON_PinMuxSet(LPC_IOCON, 1, 11,(IOCON_MODE_PULLUP |IOCON_DIGMODE_EN | IOCON_MODE_INACT) );
-	Chip_IOCON_PinMuxSet(LPC_IOCON, 1, 9,(IOCON_MODE_PULLUP |IOCON_DIGMODE_EN | IOCON_MODE_INACT) );
-	/* Configure GPIO pin as input */
-	Chip_GPIO_SetPinDIRInput(LPC_GPIO, 0, 16);
-	Chip_GPIO_SetPinDIRInput(LPC_GPIO, 1, 3);
-	Chip_GPIO_SetPinDIRInput(LPC_GPIO, 0, 0);
-
-	/* Enable PININT clock */
-	Chip_Clock_EnablePeriphClock(SYSCTL_CLOCK_PININT);
-
-	/* Reset the PININT block */
-	Chip_SYSCTL_PeriphReset(RESET_PININT);
-
-	/* Configure interrupt channel for the GPIO pin in INMUX block */
-	Chip_INMUX_PinIntSel(0, 0, 16);
-	Chip_INMUX_PinIntSel(1, 1, 3);
-	Chip_INMUX_PinIntSel(2, 0, 0);
-
-	/* Configure channel interrupt as edge sensitive and falling edge interrupt */
-	Chip_PININT_ClearIntStatus(LPC_GPIO_PIN_INT, PININTCH(0));
-	Chip_PININT_ClearIntStatus(LPC_GPIO_PIN_INT, PININTCH(1));
-	Chip_PININT_ClearIntStatus(LPC_GPIO_PIN_INT, PININTCH(2));
-	Chip_PININT_SetPinModeEdge(LPC_GPIO_PIN_INT, PININTCH(0));
-	Chip_PININT_SetPinModeEdge(LPC_GPIO_PIN_INT, PININTCH(1));
-	Chip_PININT_SetPinModeEdge(LPC_GPIO_PIN_INT, PININTCH(2));
-	Chip_PININT_EnableIntLow(LPC_GPIO_PIN_INT, PININTCH(0));
-	Chip_PININT_EnableIntLow(LPC_GPIO_PIN_INT, PININTCH(1));
-	Chip_PININT_EnableIntLow(LPC_GPIO_PIN_INT, PININTCH(2));
-	NVIC_ClearPendingIRQ(PIN_INT0_IRQn);
-	NVIC_EnableIRQ(PIN_INT0_IRQn);
-	NVIC_ClearPendingIRQ(PIN_INT1_IRQn);
-	NVIC_EnableIRQ(PIN_INT1_IRQn);
-	NVIC_ClearPendingIRQ(PIN_INT2_IRQn);
-	NVIC_EnableIRQ(PIN_INT2_IRQn);
-
 	SimpleMenu menu;
 	menuStatic= &menu;
 
@@ -218,9 +177,7 @@ int main(void)
 	Auto->setValue(60);
 	Manu->setValue(50);
 
-	DigitalIoPin sw1(0,16,true,true,true);
-	DigitalIoPin sw2(1,3,true,true,true);
-	DigitalIoPin sw3(0,0,true,true,true);
+
 
 	/* Set up SWO to PIO1_2 */
 	Chip_SWM_MovablePortPinAssign(SWM_SWO_O, 1, 2); // Needed for SWO printf
@@ -234,6 +191,26 @@ int main(void)
 	counter = 0;
 
 	BackEnd interface;
+
+	/* Set pin back to GPIO (on some boards may have been changed to something else by Board_Init()) */
+	Chip_PININT_Init(LPC_GPIO_PIN_INT);
+	//Prepping pins for interrupting definitions
+	interface.prepPinForSet(0, 16);
+	interface.prepPinForSet(1, 3);
+	interface.prepPinForSet(0, 0);
+	/* Enable PININT clock */
+	Chip_Clock_EnablePeriphClock(SYSCTL_CLOCK_PININT);
+	/* Reset the PININT block */
+	Chip_SYSCTL_PeriphReset(RESET_PININT);
+	//Setting pins for interrupting
+	interface.setPinInterrupt(0, 16, 0);
+	interface.setPinInterrupt(1, 3, 1);
+	interface.setPinInterrupt(0, 0, 2);
+
+	DigitalIoPin sw1(0,16,true,true,true);
+	DigitalIoPin sw2(1,3,true,true,true);
+	DigitalIoPin sw3(0,0,true,true,true);
+
 
 	while(1){
 		//setFrequency(node, fa[10]);
@@ -268,7 +245,6 @@ int main(void)
 			menuStatic->event(MenuItem::back);
 			back=FALSE;
 		}
-		readPressureSensor();
 
 	}
 

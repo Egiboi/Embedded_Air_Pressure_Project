@@ -24,6 +24,8 @@ public:
 	bool readPressureSensor();								//for updating pressure sensor variable
 	int getPressureSensor();								//prints pressure sensor variable
 	void delayMicroseconds(unsigned int us);				//delay function
+	void setPinInterrupt(int port, int pin, int interruptChannel); //sets pint interrupts 0-2
+	void prepPinForSet (int port, int pin); 				//Preps pins for interrupting
 private:
 
 	//modbus variables
