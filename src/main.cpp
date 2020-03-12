@@ -211,7 +211,7 @@ int main(void)
 	menuStatic= &menu;
 
 	IntegerEdit *Auto = new DecimalEdit(lcd, std::string("Automatic"), 0,120,10);
-	IntegerEdit *Manu = new DecimalEdit(lcd, std::string("Manual"),0,100,10);
+	IntegerEdit *Manu = new DecimalEdit(lcd, std::string("Manual"),0,100,5);
 
 	menu.addItem(new MenuItem(Auto));
 	menu.addItem(new MenuItem(Manu));
@@ -231,13 +231,13 @@ int main(void)
 	counter2=0;
 	menu.event(MenuItem::show); // display first menu item
 	back=FALSE;
-	counter=0;
+	counter = 0;
 
 	BackEnd interface;
 
 	while(1){
 		//setFrequency(node, fa[10]);
-		interface.setFrequency(20000);
+		interface.setFrequency(21);
 		interface.readPressureSensor();
 		printf("%d\n", (int)interface.getPressureSensor());
 
