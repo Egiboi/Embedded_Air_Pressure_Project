@@ -5,10 +5,11 @@
  *      Author: krl
  */
 
-#include "IntegerEdit.h"
+#include "BooleanEdit.h"
+
 #include <cstdio>
 
-IntegerEdit::IntegerEdit(LiquidCrystal *lcd_, std::string editTitle, int min1, int max1): lcd(lcd_), title(editTitle) {
+BooleanEdit::BooleanEdit(LiquidCrystal *lcd_, std::string editTitle, int min1, int max1): lcd(lcd_), title(editTitle) {
 	value = 0;
 	edit = 0;
 	focus = false;
@@ -16,36 +17,36 @@ IntegerEdit::IntegerEdit(LiquidCrystal *lcd_, std::string editTitle, int min1, i
 	max=max1;
 }
 
-IntegerEdit::~IntegerEdit() {
+BooleanEdit::~BooleanEdit() {
 }
 
-void IntegerEdit::increment() {
+void BooleanEdit::increment() {
 	edit=(int)edit^max;
 }
 
-void IntegerEdit::decrement() {
+void BooleanEdit::decrement() {
 	edit= (int)edit ^max;
 
 }
 
-void IntegerEdit::accept() {
+void BooleanEdit::accept() {
 	save();
 }
 
-void IntegerEdit::cancel() {
+void BooleanEdit::cancel() {
 	edit = value;
 }
 
 
-void IntegerEdit::setFocus(bool focus) {
+void BooleanEdit::setFocus(bool focus) {
 	this->focus = focus;
 }
 
-bool IntegerEdit::getFocus() {
+bool BooleanEdit::getFocus() {
 	return this->focus;
 }
 
-void IntegerEdit::display() {
+void BooleanEdit::display() {
 	lcd->clear();
 	lcd->setCursor(0,0);
 	lcd->print(title);
@@ -69,20 +70,20 @@ void IntegerEdit::display() {
 }
 
 
-void IntegerEdit::save() {
+void BooleanEdit::save() {
 	// set current value to be same as edit value
 	value = edit;
 	// todo: save current value for example to EEPROM for permanent storage
 }
 
 
-float IntegerEdit::getValue() {
+float BooleanEdit::getValue() {
 	return value;
 }
-void IntegerEdit::setValue(float value) {
+void BooleanEdit::setValue(float value) {
 	edit = value;
 	save();
 }
-bool IntegerEdit::getType(){
+bool BooleanEdit::getType(){
 	return false;
 }

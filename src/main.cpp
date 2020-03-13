@@ -38,8 +38,8 @@
 #include "DigitalIoPinMaster_class/DigitalIoPin.h"
 #include "GUI_class/SimpleMenu.h"
 #include "GUI_class/LiquidCrystal.h"
-#include "GUI_class/IntegerEdit.h"
-#include "GUI_class/DecimalEdit.h"
+#include "GUI_class/BooleanEdit.h"
+#include "GUI_class/NumberEdit.h"
 
 
 /*****************************************************************************
@@ -180,9 +180,9 @@ int main(void)
 	SimpleMenu menu;
 	menuStatic= &menu;
 
-	DecimalEdit *Auto = new DecimalEdit(lcd, std::string("Automatic"), 0,120,10);
-	DecimalEdit *Manu = new DecimalEdit(lcd, std::string("Manual"),0,100,5);
-	IntegerEdit *Standby = new IntegerEdit(lcd, std::string("Standby"),0,1);
+	NumberEdit *Auto = new NumberEdit(lcd, std::string("Automatic"), 0,120,10);
+	NumberEdit *Manu = new NumberEdit(lcd, std::string("Manual"),0,100,5);
+	BooleanEdit *Standby = new BooleanEdit(lcd, std::string("Standby"),0,1);
 
 	menu.addItem(new MenuItem(Auto));
 	menu.addItem(new MenuItem(Manu));

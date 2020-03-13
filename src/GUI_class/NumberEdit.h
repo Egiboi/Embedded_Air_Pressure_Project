@@ -5,13 +5,13 @@
  *      Author: danie
  */
 
-#include "IntegerEdit.h"
+#include "BooleanEdit.h"
 
 
-class DecimalEdit:public IntegerEdit {
+class NumberEdit:public BooleanEdit {
 public:
-	DecimalEdit(LiquidCrystal *lcd_, std::string editTitle, int min, int max,float increment);
-	virtual ~DecimalEdit();
+	NumberEdit(LiquidCrystal *lcd_, std::string editTitle, int min, int max,float increment);
+	virtual ~NumberEdit();
 	void increment()override;
 	void decrement()override;
 	void display()override;

@@ -12,10 +12,10 @@
 #include "LiquidCrystal.h"
 #include <string>
 
-class IntegerEdit: public PropertyEdit {
+class BooleanEdit: public PropertyEdit {
 public:
-	IntegerEdit(LiquidCrystal *lcd_, std::string editTitle, int min, int max);
-	virtual ~IntegerEdit();
+	BooleanEdit(LiquidCrystal *lcd_, std::string editTitle, int min, int max);
+	virtual ~BooleanEdit();
 	void increment();
 	void decrement();
 	void accept();
