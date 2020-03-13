@@ -32,10 +32,10 @@ void DecimalEdit::display() {
 	lcd->setCursor(0,1);
 	char s[17];
 	if(focus) {
-		snprintf(s, 17, "     [%4.1f]     ", edit);
+		snprintf(s, 17, "     [%3.0f]     ", edit);
 	}
 	else {
-		snprintf(s, 17, "      %4.1f      ", edit);
+		snprintf(s, 17, "      %3.0f      ", edit);
 	}
 	lcd->print(s,2);
 }

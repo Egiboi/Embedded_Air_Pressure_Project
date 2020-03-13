@@ -21,6 +21,7 @@ BackEnd::BackEnd() {
 	delayMicroseconds(1000);
 	ControlWord = 0x047F; // set drive to start mode
 	delayMicroseconds(1000);
+	speed=0;
 
 
 }
@@ -204,7 +205,7 @@ void BackEnd::delayMicroseconds(unsigned int us)
 	Chip_RIT_ClearCTRL(LPC_RITIMER,0x01);
 }
 bool BackEnd::insertAndCheckCircBuf(int index, int value){
-	//attempt at a 10 space buffer for dealing with button misreads
+	//attempt at a 10 space buffer for dealing with button misreads, not implemented well with hashmap + not working in this form due to time contraints to debug
 	bool check = TRUE;
 	int *ptr;
 	if(index==0){

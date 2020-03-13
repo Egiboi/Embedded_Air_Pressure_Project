@@ -115,6 +115,7 @@ void FrontEnd::setPressureTarget(uint16_t trg) {
 
 void FrontEnd::setMode(int i) {
 	mode = i;
+	errorcode=0;
 }
 
 void FrontEnd::defaultDisplay(LiquidCrystal*lcd, int fanspeed, int pascal){
