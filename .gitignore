@@ -1,3 +1,8 @@
 /Debug/
+/.mcuxpressoide_packages_support
+/.metadata
+.cproject
+.project
 /.settings
 .settings/language.settings.xml
+.Ilmapaine_Projekti LinkServer Debug.launch
