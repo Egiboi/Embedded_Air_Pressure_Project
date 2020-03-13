@@ -20,16 +20,11 @@ IntegerEdit::~IntegerEdit() {
 }
 
 void IntegerEdit::increment() {
-	if(edit<max){
-		edit++;
-	}
-
+	edit=(int)edit^max;
 }
 
 void IntegerEdit::decrement() {
-	if(edit>min){
-		edit--;
-	}
+	edit= (int)edit ^max;
 
 }
 
@@ -57,10 +52,18 @@ void IntegerEdit::display() {
 	lcd->setCursor(0,1);
 	char s[17];
 	if(focus) {
-		snprintf(s, 17, "     [%4.0f]     ", edit);
+		if(edit==1){
+			snprintf(s, 17, "     [YES]     ");
+		}else{
+			snprintf(s, 17, "     [ NO]     ");
+		}
 	}
 	else {
-		snprintf(s, 17, "      %4.0f      ", edit);
+		if(edit==1){
+			snprintf(s, 17, "      YES      ");
+		}else{
+			snprintf(s, 17, "       NO      ");
+		}
 	}
 	lcd->print(s,2);
 }

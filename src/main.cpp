@@ -180,13 +180,16 @@ int main(void)
 	SimpleMenu menu;
 	menuStatic= &menu;
 
-	IntegerEdit *Auto = new DecimalEdit(lcd, std::string("Automatic"), 0,120,10);
-	IntegerEdit *Manu = new DecimalEdit(lcd, std::string("Manual"),0,100,5);
+	DecimalEdit *Auto = new DecimalEdit(lcd, std::string("Automatic"), 0,120,10);
+	DecimalEdit *Manu = new DecimalEdit(lcd, std::string("Manual"),0,100,5);
+	IntegerEdit *Standby = new IntegerEdit(lcd, std::string("Standby"),0,1);
 
 	menu.addItem(new MenuItem(Auto));
 	menu.addItem(new MenuItem(Manu));
+	menu.addItem(new MenuItem(Standby));
 	Auto->setValue(60);
 	Manu->setValue(50);
+	Standby->setValue(0);
 
 
 
@@ -226,7 +229,7 @@ int main(void)
 	interface.setPinInterrupt(1, 3, 1);
 	interface.setPinInterrupt(0, 0, 2);
 	bool inDefaultRun;
-
+	int lastMode=0;
 
 
 	//wantedSpeed will be wanted speed in manual mode and current speed in automatic mode (not ideal for clarity)
@@ -275,27 +278,46 @@ int main(void)
 				//Checks focus item. Value will be used if value saves.
 				bool tempbool1=Auto -> getFocus();
 				bool tempbool2=Manu -> getFocus();
+				bool tempbool3=Standby -> getFocus();
 				menuStatic->event(MenuItem::ok);
 				counterDefaultRunScreen=0;
 				Sleep(buttonSleep);
 				//Checks if values is saved (Focus -> no Focus from ok click)
 				if(counterChangedValue>=2){
 					if (tempbool1) {
+
 						frontend.setPressureTarget((uint16_t) Auto -> getValue()); //sets pressuretarget value
 						frontend.setMode(1);//set automatic mode
+						//Set standby to be default no
+						Standby->setValue(0);
 					}
 
 					else if (tempbool2) {
 						//set manual mode
 						frontend.setMode(2);
+
 						//set speed for manual
 						wantedSpeed = (uint16_t) Manu -> getValue() / 5;
+						//Set standby to be default no
+						Standby->setValue(0);
 
+
+					}else if(tempbool3&&Standby->getValue()==1){
+						//set Standby
+						if(frontend.getMode()!=0){
+							lastMode=frontend.getMode();
+						}
+						frontend.setMode(0);
+						wantedSpeed=0;
+					}else if(tempbool3&&Standby->getValue()==0){
+						frontend.setMode(lastMode);
+						if(lastMode==2){
+							wantedSpeed= (uint16_t) Manu -> getValue() / 5;
+						}
 
 					}
 					menuStatic->print();
 					counterChangedValue=0;
-					//Give fan one second to react before run screen prints and reads speed and pressure
 					counterDefaultRunScreen=returnRunScreen;
 				}
 				int loop=0;
