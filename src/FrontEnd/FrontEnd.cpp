@@ -40,6 +40,8 @@ uint16_t FrontEnd::defaultRun(uint16_t pre, uint16_t fsp) {
 	}
 	else if (mode == 2){
 		return manualMode(fsp);
+	}else{
+		return 0;
 	}
 }
 

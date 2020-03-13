@@ -225,6 +225,7 @@ int main(void)
 	interface.setPinInterrupt(0, 16, 0);
 	interface.setPinInterrupt(1, 3, 1);
 	interface.setPinInterrupt(0, 0, 2);
+	bool inDefaultRun;
 
 
 
@@ -237,7 +238,8 @@ int main(void)
 		if(frontend.getMode()==1){
 			wantedSpeed=currentSpeed;//if mode is automatic set wantedSpeed to current speed
 		}
-
+		//Read speed in this loop for interface object, rest are getters to this value
+		interface.readPressureSensor();
 		//set frequency according to setFrequency time (currently 0.5sec)
 		if(counterSetFrequency==setFrequencyTime){
 			interface.setFrequency(frontend.defaultRun(interface.getPressureSensor(), wantedSpeed));
@@ -247,64 +249,81 @@ int main(void)
 		printf("Fan speed is: %d\n", (int)wantedSpeed);
 		printf("Pressure level is: %d\n", (int)interface.getPressureSensor());
 		//button boolean up was set and system reacts
-		if(bool1){
-			menuStatic->event(MenuItem::up);
-			while(!Chip_GPIO_GetPinState(LPC_GPIO, 0, 16)){
-				//TODO max time
-			}
+		if(inDefaultRun&&(bool1||bool2||bool3)){
+			menuStatic->event(MenuItem::show);
+			bool1=false;
+			bool2=false;
+			bool3=false;
+			inDefaultRun=false;
 			counterDefaultRunScreen=0;
-			Sleep(buttonSleep);
-			bool1=FALSE;
-		}
-		//button boolean ok was set and system reacts
-		else if(bool2){
-			//Checks focus item. Value will be used if value saves.
-			bool tempbool1=Auto -> getFocus();
-			bool tempbool2=Manu -> getFocus();
-			menuStatic->event(MenuItem::ok);
-			counterDefaultRunScreen=0;
-			Sleep(buttonSleep);
-			//Checks if values is saved (Focus -> no Focus from ok click)
-			if(counterChangedValue>=2){
-				if (tempbool1) {
-					frontend.setPressureTarget((uint16_t) Auto -> getValue()); //sets pressuretarget value
-					frontend.setMode(1);//set automatic mode
+			counterChangedValue=0;
+
+		}else{
+			if(bool1){
+				menuStatic->event(MenuItem::up);
+				int loop=0;
+				while(!Chip_GPIO_GetPinState(LPC_GPIO, 0, 16)&&loop<10){
+					Sleep(100);
+					loop++;
 				}
+				counterDefaultRunScreen=0;
+				Sleep(buttonSleep);
+				bool1=FALSE;
+			}
+			//button boolean ok was set and system reacts
+			else if(bool2){
+				//Checks focus item. Value will be used if value saves.
+				bool tempbool1=Auto -> getFocus();
+				bool tempbool2=Manu -> getFocus();
+				menuStatic->event(MenuItem::ok);
+				counterDefaultRunScreen=0;
+				Sleep(buttonSleep);
+				//Checks if values is saved (Focus -> no Focus from ok click)
+				if(counterChangedValue>=2){
+					if (tempbool1) {
+						frontend.setPressureTarget((uint16_t) Auto -> getValue()); //sets pressuretarget value
+						frontend.setMode(1);//set automatic mode
+					}
 
-				else if (tempbool2) {
-					//set manual mode
-					frontend.setMode(2);
-					//set speed for manual
-					wantedSpeed = (uint16_t) Manu -> getValue() / 5;
+					else if (tempbool2) {
+						//set manual mode
+						frontend.setMode(2);
+						//set speed for manual
+						wantedSpeed = (uint16_t) Manu -> getValue() / 5;
 
 
+					}
+					menuStatic->print();
+					counterChangedValue=0;
+					//Give fan one second to react before run screen prints and reads speed and pressure
+					counterDefaultRunScreen=returnRunScreen;
 				}
-				menuStatic->print();
-				counterChangedValue=0;
-				//Give fan one second to react before run screen prints and reads speed and pressure
-				counterDefaultRunScreen=returnRunScreen-1000;
-			}
-			while(!Chip_GPIO_GetPinState(LPC_GPIO, 1, 3)){
-				//TODO max time
-			}
-			bool2=FALSE;
+				int loop=0;
+				while(!Chip_GPIO_GetPinState(LPC_GPIO, 1, 3)&&loop<10){
+					Sleep(100);
+					loop++;
+				}
+				bool2=FALSE;
 
-		}
-		//button boolean down was set and system reacts
-		else if(bool3){
-			menuStatic->event(MenuItem::down);
-			while(!Chip_GPIO_GetPinState(LPC_GPIO, 0, 0)){
-				//TODO max time
 			}
-			counterDefaultRunScreen=0;
-			Sleep(buttonSleep);
-			bool3=FALSE;
-		}
-		//Time out to go back
-		else if(back==TRUE){
+			//button boolean down was set and system reacts
+			else if(bool3){
+				menuStatic->event(MenuItem::down);
+				int loop=0;
+				while(!Chip_GPIO_GetPinState(LPC_GPIO, 0, 0)&&loop<10){
+					Sleep(100);
+					loop++;
+				}
+				counterDefaultRunScreen=0;
+				Sleep(buttonSleep);
+				bool3=FALSE;
+			}
+			//Time out to go back
+			else if(back==TRUE){
 
-			menuStatic->event(MenuItem::back);
-			back=FALSE;
+				menuStatic->event(MenuItem::back);
+				back=FALSE;
+			}
 		}
 		//default run screen will be displayed and overwrites menu
 		if(counterDefaultRunScreen==returnRunScreen){
@@ -312,6 +331,7 @@ int main(void)
 			//When run screen is reached, next loop to update values is only 3 seconds
 			counterDefaultRunScreen=returnRunScreen-3000;
 			counterBack=0;
+			inDefaultRun=true;
 		}
 
 		Sleep(mainSleep);
