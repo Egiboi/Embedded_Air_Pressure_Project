@@ -5,27 +5,28 @@
  *      Author: danie
  */
 
-#include "DecimalEdit.h"
+#include "NumberEdit.h"
+
 #include <cstdio>
 
-DecimalEdit::DecimalEdit(LiquidCrystal *lcd_, std::string editTitle, int min1, int max1,float increment):IntegerEdit(lcd_,editTitle,min1,max1){
+NumberEdit::NumberEdit(LiquidCrystal *lcd_, std::string editTitle, int min1, int max1,float increment):BooleanEdit(lcd_,editTitle,min1,max1){
 	incr= increment;
 }
-void DecimalEdit::increment(){
+void NumberEdit::increment(){
 	if(edit+incr<=(max+incr*9/10)){
 		edit= edit+ incr;
 	}
 
 }
-void DecimalEdit::decrement(){
+void NumberEdit::decrement(){
 	if(edit-incr>=min){
 		edit=edit-incr;
 	}
 }
-DecimalEdit::~DecimalEdit(){
+NumberEdit::~NumberEdit(){
 
 }
-void DecimalEdit::display() {
+void NumberEdit::display() {
 	lcd->clear();
 	lcd->setCursor(0,0);
 	lcd->print(title);
@@ -39,10 +40,10 @@ void DecimalEdit::display() {
 	}
 	lcd->print(s,2);
 }
-float DecimalEdit::getValue() {
+float NumberEdit::getValue() {
 	return value;
 }
-bool DecimalEdit::getType(){
+bool NumberEdit::getType(){
 	return true;
 }
 
